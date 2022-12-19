@@ -1,6 +1,33 @@
 [profile.default]
+solc = '0.8.17'
+via_ir = false
 src = 'src'
 out = 'out'
 libs = ['lib']
+fuzz_runs = 5000
+fuzz_max_global_rejects = 2_000_000
+optimizer = true
+optimizer_runs = 1_042_069
+extra_output = ["evm.assembly", "irOptimized", "devdoc"]
+gas_reports = ["ERC721"]
+
+[profile.default.optimizer_details]
+peephole = true
+inliner = true
+jumpdestRemover = true
+orderLiterals = true
+deduplicate = true
+cse = true
+constantOptimizer = true
+yul = true
+
+[profile.default.optimizer_details.yulDetails]
+stackAllocation = true
+optimizerSteps = "dhfoDgvulfnTUtnIf[xa[r]EscLMcCTUtTOntnfDIulLculVcul [j]Tpeulxa[rul]xa[r]cLgvifCTUca[r]LSsTOtfDnca[r]Iulc]jmul[jul] VcTOcul jmul"
+
+[fmt]
+line_length = 120
+tab_width = 4
+bracket_spacing = true
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
