@@ -52,64 +52,6 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
     constructor() { }
 
     /**
-     * @notice  `to`에게 하나의 토큰을 배포합니다.
-     * @dev     스토리지 영역이 초기화되지 않았기 때문에, 초기 가스비용이 많이 소모된다.
-     * @param   to 토큰을 받을 주소
-     */
-    function mint(address to) external {
-        assembly {
-            // 소유자 밸런스 증가
-            mstore(0x0, to)
-            mstore(0x20, ownerInfo.slot)
-            let PoS := keccak256(0x0, 0x40)
-            sstore(PoS, add(sload(PoS), 0x1))
-
-            // 현재 토큰 카운터를 토큰 아이디로 사용하기 위해 메모리에 저장
-            mstore(0x0, sload(tokenIndex.slot))
-
-            // 저장된 토큰 카운터에 해당하는 정보 저장.
-            mstore(0x20, mload(0x0))
-            mstore(0x40, tokenInfo.slot)
-            sstore(keccak256(0x20, 0x40), to)
-            // 토큰 카운터 1증가
-            sstore(tokenIndex.slot, add(mload(0x0), 0x1))
-
-            log4(0x0, 0x0, Event_Approval_Signature, 0x0, calldataload(0x4), add(mload(0x0), 0x1))
-        }
-    }
-
-    /**
-     * @notice  `to`에게 `quantity`만큼 토큰을 배포합니다.
-     * @dev     스토리지 영역이 초기화되지 않았기 때문에, 초기 가스비용이 많이 소모된다.
-     * @param   to          토큰을 받을 주소
-     * @param   quantity    생성할 토큰 수량
-     */
-    function mint(address to, uint256 quantity) external {
-        assembly {
-            // 0x00 현재 토큰 카운터
-            mstore(0x20, add(mload(0x0), quantity))
-            mstore(0x0, sload(tokenIndex.slot))
-
-            // 소유자 밸런스 증가
-            mstore(0x40, to)
-            mstore(0x60, ownerInfo.slot)
-            let PoS := keccak256(0x40, 0x40)
-            sstore(PoS, add(sload(PoS), quantity))
-
-            for { let tokenId := mload(0x0) } iszero(eq(tokenId, mload(0x20))) { tokenId := add(tokenId, 0x1) } {
-                // 저장된 토큰 카운터에 해당하는 정보 저장.
-                mstore(0x40, tokenId)
-                mstore(0x60, tokenInfo.slot)
-                sstore(keccak256(0x40, 0x40), to)
-                log4(0x0, 0x0, Event_Approval_Signature, 0x0, calldataload(0x4), tokenId)
-            }
-
-            // 토큰 카운터 수량만큼 증가
-            sstore(tokenIndex.slot, mload(0x20))
-        }
-    }
-
-    /**
      * @notice  토큰을 가지고 있는 from 주소로 부터, to 주소에게 토큰을 전송합니다.
      * @param   from    토큰 소유자 주소
      * @param   to      토큰 수신자 주소
@@ -442,5 +384,63 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
     function tokenURI(uint256 tokenId) external pure override returns (string memory) {
         return string(abi.encodePacked(baseURI, tokenId, ".json"));
+    }
+
+    /**
+     * @notice  `to`에게 하나의 토큰을 배포합니다.
+     * @dev     스토리지 영역이 초기화되지 않았기 때문에, 초기 가스비용이 많이 소모된다.
+     * @param   to 토큰을 받을 주소
+     */
+    function _mint(address to) internal {
+        assembly {
+            // 소유자 밸런스 증가
+            mstore(0x0, to)
+            mstore(0x20, ownerInfo.slot)
+            let PoS := keccak256(0x0, 0x40)
+            sstore(PoS, add(sload(PoS), 0x1))
+
+            // 현재 토큰 카운터를 토큰 아이디로 사용하기 위해 메모리에 저장
+            mstore(0x0, sload(tokenIndex.slot))
+
+            // 저장된 토큰 카운터에 해당하는 정보 저장.
+            mstore(0x20, mload(0x0))
+            mstore(0x40, tokenInfo.slot)
+            sstore(keccak256(0x20, 0x40), to)
+            // 토큰 카운터 1증가
+            sstore(tokenIndex.slot, add(mload(0x0), 0x1))
+
+            log4(0x0, 0x0, Event_Approval_Signature, 0x0, calldataload(0x4), add(mload(0x0), 0x1))
+        }
+    }
+
+    /**
+     * @notice  `to`에게 `quantity`만큼 토큰을 배포합니다.
+     * @dev     스토리지 영역이 초기화되지 않았기 때문에, 초기 가스비용이 많이 소모된다.
+     * @param   to          토큰을 받을 주소
+     * @param   quantity    생성할 토큰 수량
+     */
+    function _mint(address to, uint256 quantity) internal {
+        assembly {
+            // 0x00 현재 토큰 카운터
+            mstore(0x20, add(mload(0x0), quantity))
+            mstore(0x0, sload(tokenIndex.slot))
+
+            // 소유자 밸런스 증가
+            mstore(0x40, to)
+            mstore(0x60, ownerInfo.slot)
+            let PoS := keccak256(0x40, 0x40)
+            sstore(PoS, add(sload(PoS), quantity))
+
+            for { let tokenId := mload(0x0) } iszero(eq(tokenId, mload(0x20))) { tokenId := add(tokenId, 0x1) } {
+                // 저장된 토큰 카운터에 해당하는 정보 저장.
+                mstore(0x40, tokenId)
+                mstore(0x60, tokenInfo.slot)
+                sstore(keccak256(0x40, 0x40), to)
+                log4(0x0, 0x0, Event_Approval_Signature, 0x0, calldataload(0x4), tokenId)
+            }
+
+            // 토큰 카운터 수량만큼 증가
+            sstore(tokenIndex.slot, mload(0x20))
+        }
     }
 }

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import { ERC721, IERC721, IERC721Metadata, IERC165 } from "../src/ERC721.sol";
+import { ERC721Mock as ERC721, IERC721, IERC721Metadata, IERC165 } from "./ERC721Mock.sol";
 import "../src/IERC721TokenReceiver.sol";
 
 contract Receiver is IERC721TokenReceiver {
@@ -59,14 +59,25 @@ contract ERC721Deployed is ERC721Bed {
         super.setUp();
     }
 
-    // function testBulkMint() public {
-    //     erc721.mint(alice, 3);
-    //     assertEq(erc721.balanceOf(alice), 3);
-    //     assertEq(erc721.ownerOf(0), alice);
-    //     assertEq(erc721.ownerOf(1), alice);
-    //     assertEq(erc721.ownerOf(2), alice);
-    //     assertEq(erc721.ownerOf(3), address(0));
-    // }
+    function testBulkMintWith3Times() public {
+        erc721.mint(alice, 3);
+        assertEq(erc721.balanceOf(alice), 3);
+        assertEq(erc721.ownerOf(0), alice);
+        assertEq(erc721.ownerOf(1), alice);
+        assertEq(erc721.ownerOf(2), alice);
+        assertEq(erc721.ownerOf(3), address(0));
+    }
+
+    function testBulkMintWith5Times() public {
+        erc721.mint(alice, 5);
+        assertEq(erc721.balanceOf(alice), 5);
+        assertEq(erc721.ownerOf(0), alice);
+        assertEq(erc721.ownerOf(1), alice);
+        assertEq(erc721.ownerOf(2), alice);
+        assertEq(erc721.ownerOf(3), alice);
+        assertEq(erc721.ownerOf(4), alice);
+        assertEq(erc721.ownerOf(5), address(0));
+    }
 
     function testSafeTransferFromWithData() public {
         vm.prank(alice);
