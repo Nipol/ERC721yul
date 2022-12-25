@@ -15,20 +15,21 @@ Solidity의 중간 언어인 yul을 이용하여 NFT 컨트랙트를 구현
 
 ## Gas Usage
 ```
-| src/ERC721.sol:ERC721 contract                  |                 |       |        |       |         |
-|-------------------------------------------------|-----------------|-------|--------|-------|---------|
-| Deployment Cost                                 | Deployment Size |       |        |       |         |
-| 799039                                          | 4019            |       |        |       |         |
-| Function Name                                   | min             | avg   | median | max   | # calls |
-| approve                                         | 4748            | 23423 | 26793  | 28793 | 17      |
-| balanceOf                                       | 552             | 1599  | 2552   | 2552  | 42      |
-| getApproved                                     | 364             | 1311  | 364    | 2364  | 19      |
-| isApprovedForAll                                | 776             | 1633  | 776    | 2776  | 14      |
-| mint                                            | 66798           | 66798 | 66798  | 66798 | 44      |
-| ownerOf                                         | 458             | 1548  | 2458   | 2458  | 22      |
-| safeTransferFrom(address,address,uint256)       | 466             | 29325 | 35751  | 37679 | 15      |
-| safeTransferFrom(address,address,uint256,bytes) | 707             | 30892 | 36043  | 37970 | 18      |
-| setApprovalForAll                               | 24487           | 24487 | 24487  | 24487 | 15      |
-| supportsInterface                               | 246             | 278   | 284    | 297   | 4       |
-| transferFrom                                    | 441             | 18788 | 20403  | 34418 | 6       |
+| src/ERC721.sol:ERC721 contract                  |                 |        |        |        |         |
+|-------------------------------------------------|-----------------|--------|--------|--------|---------|
+| Deployment Cost                                 | Deployment Size |        |        |        |         |
+| 751794                                          | 3783            |        |        |        |         |
+| Function Name                                   | min             | avg    | median | max    | # calls |
+| approve                                         | 4723            | 23398  | 26768  | 28768  | 17      |
+| balanceOf                                       | 574             | 1597   | 2574   | 2574   | 43      |
+| getApproved                                     | 370             | 1317   | 370    | 2370   | 19      |
+| isApprovedForAll                                | 776             | 1633   | 776    | 2776   | 14      |
+| mint(address)                                   | 68710           | 68710  | 68710  | 68710  | 41      |
+| mint(address,uint256)                           | 165239          | 165239 | 165239 | 165239 | 1       |
+| ownerOf                                         | 474             | 1402   | 474    | 2474   | 28      |
+| safeTransferFrom(address,address,uint256)       | 2660            | 31326  | 35668  | 37566  | 14      |
+| safeTransferFrom(address,address,uint256,bytes) | 2882            | 32577  | 35960  | 37822  | 17      |
+| setApprovalForAll                               | 24487           | 24487  | 24487  | 24487  | 15      |
+| supportsInterface                               | 246             | 278    | 284    | 297    | 4       |
+| transferFrom                                    | 2616            | 22378  | 33616  | 34300  | 5       |
 ```

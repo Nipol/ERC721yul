@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "../src/ERC721.sol";
+import { ERC721, IERC721, IERC721Metadata, IERC165 } from "../src/ERC721.sol";
 import "../src/IERC721TokenReceiver.sol";
 
 contract Receiver is IERC721TokenReceiver {
@@ -58,6 +58,15 @@ contract ERC721Deployed is ERC721Bed {
     function setUp() public override {
         super.setUp();
     }
+
+    // function testBulkMint() public {
+    //     erc721.mint(alice, 3);
+    //     assertEq(erc721.balanceOf(alice), 3);
+    //     assertEq(erc721.ownerOf(0), alice);
+    //     assertEq(erc721.ownerOf(1), alice);
+    //     assertEq(erc721.ownerOf(2), alice);
+    //     assertEq(erc721.ownerOf(3), address(0));
+    // }
 
     function testSafeTransferFromWithData() public {
         vm.prank(alice);
@@ -138,11 +147,6 @@ contract ERC721Minted is ERC721Bed {
         erc721.mint(alice);
     }
 
-    function testSafeTransferFromWithDataToZeroAddress() public {
-        vm.expectRevert(bytes4(keccak256("ERC721_NotAllowedZeroAddress()")));
-        erc721.safeTransferFrom(alice, address(0), 0, "");
-    }
-
     function testSafeTransferFromWithData() public {
         vm.prank(alice);
         vm.expectEmit(true, true, true, true);
@@ -209,11 +213,6 @@ contract ERC721Minted is ERC721Bed {
         assertEq(erc721.ownerOf(0), bob);
     }
 
-    function testSafeTransferFromToZeroAddress() public {
-        vm.expectRevert(bytes4(keccak256("ERC721_NotAllowedZeroAddress()")));
-        erc721.safeTransferFrom(alice, address(0), 0);
-    }
-
     function testSafeTransferFromNotFromOwner() public {
         vm.expectRevert(bytes4(keccak256("ERC721_NotOperaterable()")));
         erc721.safeTransferFrom(alice, bob, 0);
@@ -258,11 +257,6 @@ contract ERC721Minted is ERC721Bed {
         assertEq(erc721.balanceOf(alice), 0);
         assertEq(erc721.balanceOf(bob), 1);
         assertEq(erc721.ownerOf(0), bob);
-    }
-
-    function testTransferFromToZeroAddress() public {
-        vm.expectRevert(bytes4(keccak256("ERC721_NotAllowedZeroAddress()")));
-        erc721.transferFrom(alice, address(0), 0);
     }
 
     function testTransferFromNotFromOwner() public {
