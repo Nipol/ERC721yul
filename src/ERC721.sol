@@ -18,8 +18,6 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
     error ERC721_NotOperaterable();
 
-    error ERC721_NotAllowedZeroAddress();
-
     string public constant name = "NFT NAME";
     string public constant symbol = "NFT SYMBOL";
     string public constant baseURI = "ipfs://";
