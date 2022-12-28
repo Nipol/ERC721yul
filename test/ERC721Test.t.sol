@@ -5,21 +5,48 @@ import "forge-std/Test.sol";
 import "../src/ERC721.sol";
 import "../src/IERC721TokenReceiver.sol";
 
+
+
 contract Receiver is IERC721TokenReceiver {
+    bool private executing;
     function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+ // Acquire the mutex
+require(!executing, "Contract is currently executing");
+        executing = true;
+
+        //  code here...
         return IERC721TokenReceiver.onERC721Received.selector;
+          // Release the mutex
+        executing = false;
     }
 }
 
 contract WrongReceiver is IERC721TokenReceiver {
+    bool private executing;
     function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+
+         // Acquire the mutex
+require(!executing, "Contract is currently executing");
+        executing = true;
+
+        //  code here...
         return 0xBEEFDEAD;
+          // Release the mutex
+        executing = false;
     }
 }
 
 contract RevertReceiver is IERC721TokenReceiver {
+    bool private executing;
     function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+        // Acquire the mutex
+require(!executing, "Contract is currently executing");
+        executing = true;
+
+        //  code here...
         revert("Peek A Boo");
+          // Release the mutex
+        executing = false;
     }
 }
 
