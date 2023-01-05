@@ -187,7 +187,7 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                 mstore(0x44, caller())
                 mstore(0x64, from)
                 mstore(0x84, tokenId)
-                mstore(0xa4, 0x0000000000000000000000000000000000000000000000000000000000000040)
+                mstore(0xa4, 0x0000000000000000000000000000000000000000000000000000000000000080)
 
                 // 4 + (32 * 5) + 1, 데이터 포지션 기록으로 인해 32 + 1bytes padding
                 switch iszero(staticcall(gas(), to, 0x40, 0xa5, 0x0, 0x20))
