@@ -110,7 +110,7 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                 mstore(0x84, tokenId)
                 calldatacopy(0xa4, 0x64, sub(calldatasize(), 0x64))
 
-                switch iszero(staticcall(gas(), to, 0x40, add(0x64, sub(calldatasize(), 0x64)), 0x0, 0x20))
+                switch iszero(staticcall(gas(), to, 0x40, calldatasize(), 0x0, 0x20))
                 case true {
                     // revert case
                     let returnDataSize := returndatasize()
@@ -188,9 +188,10 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                 mstore(0x64, from)
                 mstore(0x84, tokenId)
                 mstore(0xa4, 0x0000000000000000000000000000000000000000000000000000000000000080)
+                mstore(0xc4, 0x0000000000000000000000000000000000000000000000000000000000000000)
 
-                // 4 + (32 * 5) + 1, 데이터 포지션 기록으로 인해 32 + 1bytes padding
-                switch iszero(staticcall(gas(), to, 0x40, 0xa5, 0x0, 0x20))
+                // 4 + (32 * 5), 데이터 포지션 기록으로 인해 32 * 5 padding
+                switch iszero(staticcall(gas(), to, 0x40, 0xa4, 0x0, 0x20))
                 case true {
                     // revert case
                     let returnDataSize := returndatasize()
