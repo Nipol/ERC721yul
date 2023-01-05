@@ -408,7 +408,7 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             // 토큰 카운터 1증가
             sstore(tokenIndex.slot, add(mload(0x0), 0x1))
 
-            log4(0x0, 0x0, Event_Transfer_Signature, 0x0, calldataload(0x4), add(mload(0x0), 0x1))
+            log4(0x0, 0x0, Event_Transfer_Signature, 0x0, calldataload(0x4), mload(0x0))
         }
     }
 
