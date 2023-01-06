@@ -1,6 +1,57 @@
 # ERC721yul
 
-Stack minimized ERC721 Implementations.
+Gas minimized ERC721 Library Implementations.
+
+## Installation
+
+To install with [Foundry](https://github.com/gakonst/foundry):
+
+```
+forge install Nipol/ERC721yul
+```
+
+To install with [DappTools](https://github.com/dapphub/dapptools):
+
+```
+dapp install Nipol/ERC721yul
+```
+
+
+## Usage
+The library is focused on providing the functions of ERC721. therefore, `name`, `symbol`, and `tokenURI` functions must be written by the developer. These are standard interfaces and must be implemented.
+
+```solidity
+pragma solidity ^0.8.17;
+
+import "ERC721/ERC721.sol";
+
+contract ERC721Sample is ERC721 {
+    string public constant name = "NFT NAME";
+    string public constant symbol = "NFT SYMBOL";
+    string public constant baseURI = "ipfs://";
+    
+    /// If you need to mint a token, you can use it as follows
+    function mint(address to) external {
+        _mint(to);
+    }
+
+    function mint(address to, uint256 quantity) external {
+        _mint(to, quantity);
+    }
+
+    function safeMint(address to, bytes calldata data) external {
+        _safemint(to, data);
+    }
+
+    function safeMint(address to, uint256 quantity, bytes calldata data) external {
+        _safeMint(to, quantity, data);
+    }
+
+    function tokenURI(uint256 tokenId) external pure override returns (string memory) {
+        return string(abi.encodePacked(baseURI, tokenId, ".json"));
+    }
+}
+```
 
 ## TODO
 
