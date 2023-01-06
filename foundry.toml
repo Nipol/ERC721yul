@@ -7,7 +7,11 @@ libs = ['lib']
 optimizer = true
 optimizer_runs = 4_294_967_295
 extra_output = ["evm.assembly", "irOptimized", "devdoc"]
-gas_reports = ["ERC721"]
+gas_reports = ["ERC721Mock"]
+remappings = [
+    'forge-std/=lib/forge-std/src/',
+    'ERC721/=src/',
+]
 
 [profile.default.optimizer_details]
 peephole = true
