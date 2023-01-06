@@ -13,14 +13,11 @@ import "./IERC721Metadata.sol";
  * @author yoonsung.eth
  * @dev 일반적으로 사용하는 방법에 맞춰 최적화한 NFT.
  */
-contract ERC721 is IERC721Metadata, IERC721, IERC165 {
+abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
     error ERC721_NotOwnedToken();
 
     error ERC721_NotOperaterable();
 
-    string public constant name = "NFT NAME";
-    string public constant symbol = "NFT SYMBOL";
-    string public constant baseURI = "ipfs://";
     uint256 private tokenIndex;
 
     // token information
@@ -46,8 +43,6 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
     mapping(address => uint256) private ownerInfo;
     mapping(uint256 => address) private tokenAllowance;
     mapping(address => mapping(address => bool)) private operatorApprovals;
-
-    constructor() { }
 
     /**
      * @notice  토큰을 가지고 있는 from 주소로 부터, to 주소에게 토큰을 전송합니다.
@@ -187,8 +182,8 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                 mstore(0x44, caller())
                 mstore(0x64, from)
                 mstore(0x84, tokenId)
-                mstore(0xa4, 0x0000000000000000000000000000000000000000000000000000000000000080)
                 mstore(0xc4, 0x0000000000000000000000000000000000000000000000000000000000000000)
+                mstore(0xa4, 0x0000000000000000000000000000000000000000000000000000000000000080)
 
                 // 4 + (32 * 5), 데이터 포지션 기록으로 인해 32 * 5 padding
                 switch iszero(staticcall(gas(), to, 0x40, 0xa4, 0x0, 0x20))
@@ -381,9 +376,7 @@ contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             || interfaceID == type(IERC165).interfaceId;
     }
 
-    function tokenURI(uint256 tokenId) external pure override returns (string memory) {
-        return string(abi.encodePacked(baseURI, tokenId, ".json"));
-    }
+    function tokenURI(uint256 tokenId) external pure virtual returns (string memory);
 
     /**
      * @notice  `to`에게 하나의 토큰을 배포합니다.

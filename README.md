@@ -21,7 +21,7 @@ Stack minimized ERC721 Implementations.
 | test/ERC721Mock.sol:ERC721Mock contract         |                 |        |        |        |         |
 |-------------------------------------------------|-----------------|--------|--------|--------|---------|
 | Deployment Cost                                 | Deployment Size |        |        |        |         |
-| 914957                                          | 4598            |        |        |        |         |
+| 914757                                          | 4597            |        |        |        |         |
 | Function Name                                   | min             | avg    | median | max    | # calls |
 | approve                                         | 4723            | 23395  | 26765  | 28765  | 17      |
 | balanceOf                                       | 574             | 1574   | 1574   | 2574   | 48      |
@@ -32,8 +32,8 @@ Stack minimized ERC721 Implementations.
 | ownerOf                                         | 474             | 1374   | 474    | 2474   | 40      |
 | safeMint(address,bytes)                         | 72223           | 72240  | 72230  | 72268  | 3       |
 | safeMint(address,uint256,bytes)                 | 121902          | 121902 | 121902 | 121902 | 1       |
-| safeTransferFrom(address,address,uint256)       | 2660            | 31331  | 35674  | 37577  | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2987            | 32676  | 36070  | 37927  | 17      |
+| safeTransferFrom(address,address,uint256)       | 2660            | 31329  | 35671  | 37574  | 14      |
+| safeTransferFrom(address,address,uint256,bytes) | 2987            | 32677  | 36070  | 37927  | 17      |
 | setApprovalForAll                               | 24531           | 24531  | 24531  | 24531  | 15      |
 | supportsInterface                               | 246             | 278    | 284    | 297    | 4       |
 | transferFrom                                    | 2616            | 22378  | 33616  | 34300  | 5       |
