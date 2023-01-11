@@ -24,3 +24,38 @@ uint256 constant Event_ApprovalForAll_Signature = (0x17307eab39ab6107e8899845ad3
 
 uint256 constant Error_NotOwnedToken_Signature = (0x9705858800000000000000000000000000000000000000000000000000000000);
 uint256 constant Error_NotOperaterable_Signature = (0xce6494fa00000000000000000000000000000000000000000000000000000000);
+
+// (uint256(keccak256('ERC721yul.tokenIndex')) - 1)[:4]
+uint256 constant Slot_TokenIndex = (0x5015e739);
+
+//
+// Prototype
+// mapping(uint256 => uint256) private tokenInfo;
+//
+// slot map
+//   3                   2                   1                   0
+// 2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+// ┌───────────────────────┬───────────────────────────────────────┐
+// │       Future Use      │              Owner Address            │
+// └───────────────────────┴───────────────────────────────────────┘
+// (uint256(keccak256('ERC721yul.tokenInfo')) - 1)[:4]
+uint256 constant Slot_TokenInfo = (0x5f566c50);
+
+//
+// Prototype
+// mapping(uint256 => uint256) private ownerInfo;
+//
+// slot map
+//    3                   2                   1                   0
+//  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+// ┌─────────────────────────────────────────────┬─────────────────┐
+// │       Future Use                            │     balances    │
+// └─────────────────────────────────────────────┴─────────────────┘
+// (uint256(keccak256('ERC721yul.ownerInfo')) - 1)[:4]
+uint256 constant Slot_OwnerInfo = (0xe397be3c);
+
+// (uint256(keccak256('ERC721yul.tokenAllowance')) - 1)[:4]
+uint256 constant Slot_TokenAllowance = (0xccea0117);
+
+// (uint256(keccak256('ERC721yul.operatorApprovals')) - 1)[:4]
+uint256 constant Slot_OperatorApprovals = (0xff81a518);
