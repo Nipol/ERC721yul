@@ -17,7 +17,6 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
     bytes32 public immutable DOMAIN_SEPARATOR;
 
     constructor(string memory name, string memory version) {
-        bytes32 typehash = EIP712DOMAIN_TYPEHASH;
         DOMAIN_SEPARATOR = hashDomainSeperator(name, version);
     }
 
