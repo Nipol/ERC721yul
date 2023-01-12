@@ -112,20 +112,22 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | safeMint(address,bytes)                         | 72226           | 72243  | 72233  | 72271  | 3       |
 | safeMint(address,uint256,bytes)                 | 121884          | 121884 | 121884 | 121884 | 1       |
 | safeTransferFrom(address,address,uint256)       | 2666            | 31335  | 35677  | 37580  | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2991            | 32674  | 36069  | 37922  | 17      |
+| safeTransferFrom(address,address,uint256,bytes) | 2991            | 32675  | 36069  | 37922  | 17      |
 | setApprovalForAll                               | 24531           | 24531  | 24531  | 24531  | 15      |
 | supportsInterface                               | 246             | 278    | 284    | 297    | 4       |
 | transferFrom                                    | 2622            | 22384  | 33621  | 34306  | 5       |
+```
 
+```
 | test/ERC4494Mock.sol:ERC4494Mock contract |                 |       |        |       |         |
 |-------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                           | Deployment Size |       |        |       |         |
-| 1134252                                   | 5956            |       |        |       |         |
+| 1158679                                   | 6078            |       |        |       |         |
 | Function Name                             | min             | avg   | median | max   | # calls |
-| DOMAIN_SEPARATOR                          | 317             | 317   | 317    | 317   | 1       |
-| PERMIT_TYPEHASH                           | 295             | 295   | 295    | 295   | 1       |
+| DOMAIN_SEPARATOR                          | 317             | 317   | 317    | 317   | 6       |
+| PERMIT_TYPEHASH                           | 295             | 295   | 295    | 295   | 6       |
 | getApproved                               | 370             | 370   | 370    | 370   | 1       |
-| mint                                      | 68804           | 68804 | 68804  | 68804 | 1       |
-| nonces                                    | 423             | 1423  | 1423   | 2423  | 2       |
-| permit                                    | 31494           | 31494 | 31494  | 31494 | 1       |
+| mint                                      | 68804           | 68804 | 68804  | 68804 | 6       |
+| nonces                                    | 423             | 2137  | 2423   | 2423  | 7       |
+| permit                                    | 764             | 7195  | 2870   | 31414 | 6       |
 ```

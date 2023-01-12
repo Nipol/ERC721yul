@@ -8,6 +8,10 @@ import "./IEIP712.sol";
 import "ERC721/Constants.sol";
 
 abstract contract ERC4494 is IERC4494, IEIP712 {
+    error ERC4494_InvalidSignature();
+
+    error ERC4494_TimeOut();
+
     bytes32 public constant EIP712DOMAIN_TYPEHASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
@@ -28,83 +32,79 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
         assembly {
             // 서명 길이 체크
             if iszero(eq(calldataload(0x84), 0x41)) {
-                mstore(0x0, 0x1)
-                revert(0x0, 0x20)
+                mstore(0x0, Error_InvalidSignature_Signature)
+                revert(0x0, 0x4)
             }
 
             // deadline check
-            // TODO: custom error
             if or(eq(timestamp(), deadline), gt(timestamp(), deadline)) {
-                mstore(0x0, 0x2)
-                revert(0x0, 0x20)
+                mstore(0x0, Error_TimeOut_Signature)
+                revert(0x0, 0x4)
             }
             let pre := "\x19\x01"
             let memPtr := mload(0x40)
 
-            // 토큰 정보 조회
-            mstore(add(memPtr, 0x20), Slot_TokenInfo)
-            mstore(memPtr, tokenId)
-            // 포지션 키 계산
-            let pos := keccak256(memPtr, 0x40)
-            // 필드 정보를 0x0에 저장
-            mstore(0x0, sload(pos))
+            mstore(Permit_ptr, Slot_TokenInfo)
+            mstore(Permit_tokenId_ptr, tokenId)
+            // 토큰 정보 포지션 키 계산
+            let pos := keccak256(Permit_tokenId_ptr, 0x40)
+            // 토큰 정보 필드를 0x0에 저장
+            mstore(Permit_tokenInfo_ptr, sload(pos))
 
             // generate hash
-            mstore(memPtr, permit_typehash)
-            mstore(add(memPtr, 0x20), spender)
-            mstore(add(memPtr, 0x40), tokenId)
-            mstore(add(memPtr, 0x60), shr(mload(0x0), 0xa0)) // Token Info의 앞쪽 데이터를 가져와야함.
-            mstore(add(memPtr, 0x80), deadline)
+            mstore(Permit_ptr, permit_typehash)
+            mstore(0x60, spender)
+            mstore(0x80, tokenId)
+            mstore(0xa0, shr(mload(Permit_tokenInfo_ptr), 0xa0)) // Token Info의 앞쪽 데이터를 가져와야함.
+            mstore(0xc0, deadline)
 
             // 앞의 데이터를 먼저 끝에 넣음
-            mstore(add(memPtr, 0x22), keccak256(memPtr, 0xa0))
-            mstore(memPtr, pre)
-            mstore(add(memPtr, 0x2), domain_deparator)
+            mstore(0x62, keccak256(Permit_ptr, 0xa0))
+            mstore(Permit_ptr, pre)
+            mstore(0x42, domain_deparator)
 
-            mstore(memPtr, keccak256(memPtr, 0x42))
-            mstore(add(memPtr, 0x20), 0x0)
-            calldatacopy(add(memPtr, 0x3f), 0xe4, 0x2)
-            calldatacopy(add(memPtr, 0x40), 0xa4, 0x20)
-            calldatacopy(add(memPtr, 0x60), 0xc4, 0x20)
+            mstore(Permit_ptr, keccak256(Permit_ptr, 0x42))
+            mstore(0x60, 0x0) // initialize for v
+            calldatacopy(Permit_sig_v_ptr, 0xe4, 0x2)
+            calldatacopy(Permit_sig_r_ptr, 0xa4, 0x20)
+            calldatacopy(Permit_sig_s_ptr, 0xc4, 0x20)
 
-            // 호출에 실패한 경우
-            if iszero(staticcall(gas(), 0x01, memPtr, 0x80, memPtr, 0x20)) {
-                mstore(0x0, 0x3)
-                revert(0x0, 0x20)
+            // check malleability
+            if gt(mload(0xa0), Signature_s_malleability) {
+                mstore(0x0, Error_InvalidSignature_Signature)
+                revert(0x0, 0x4)
             }
 
-            // 반환이 없는 경우
-            if eq(returndatasize(), 0) {
-                mstore(0x0, 0x4)
-                revert(0x0, 0x20)
-            }
+            pop(staticcall(gas(), 0x01, Permit_ptr, 0x80, Permit_ptr, 0x20))
 
-            // 소유자, 또는 반환 주소가 0 경우
+            // 실제 소유자와 주소가 다른 경우
             if or(
-                iszero(eq(and(mload(0x0), 0xffffffffffffffffffffffffffffffffffffffff), mload(memPtr))),
-                eq(0x0, mload(memPtr))
+                iszero(eq(and(mload(Permit_tokenInfo_ptr), 0xffffffffffffffffffffffffffffffffffffffff), mload(Permit_ptr))),
+                iszero(returndatasize())
             ) {
-                mstore(0x0, 0x5)
-                revert(0x0, 0x20)
+                mstore(0x0, Error_InvalidSignature_Signature)
+                revert(0x0, 0x4)
             }
 
             // force approve
-            mstore(memPtr, tokenId)
-            mstore(add(memPtr, 0x20), Slot_TokenAllowance)
-            sstore(keccak256(memPtr, 0x40), spender)
+            mstore(Permit_ptr, Slot_TokenAllowance)
+            sstore(keccak256(Permit_tokenId_ptr, 0x40), spender)
 
             // nonce 증가
-            sstore(pos, add(mload(0x0), 0x0000000000000000000000010000000000000000000000000000000000000000))
+            sstore(pos, add(mload(Permit_tokenInfo_ptr), 0x0000000000000000000000010000000000000000000000000000000000000000))
 
             // 토큰 인포에서 소유자 정보 넣어줘야 함
             log4(
                 0x0,
                 0x0,
                 Event_Approval_Signature,
-                and(mload(0x0), 0xffffffffffffffffffffffffffffffffffffffff),
+                and(mload(Permit_tokenInfo_ptr), 0xffffffffffffffffffffffffffffffffffffffff),
                 spender,
                 tokenId
             )
+
+            // restore
+            mstore(mload(Permit_ptr), memPtr)
         }
     }
 

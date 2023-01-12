@@ -16,6 +16,15 @@ uint256 constant Approve_Owner_ptr = 0x80;
 uint256 constant OperatorApproval_ptr = 0x00;
 uint256 constant OperatorApproval_next_ptr = 0x20;
 
+uint256 constant Permit_tokenInfo_ptr = 0x00;
+uint256 constant Permit_tokenId_ptr = 0x20;
+uint256 constant Permit_ptr = 0x40;
+uint256 constant Permit_sig_v_ptr = 0x7f;
+uint256 constant Permit_sig_r_ptr = 0x80;
+uint256 constant Permit_sig_s_ptr = 0xa0;
+
+uint256 constant Signature_s_malleability = (0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0);
+
 uint256 constant TokenReceiver_Signature = (0x150b7a0200000000000000000000000000000000000000000000000000000000);
 
 uint256 constant Event_Transfer_Signature = (0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef);
@@ -24,6 +33,9 @@ uint256 constant Event_ApprovalForAll_Signature = (0x17307eab39ab6107e8899845ad3
 
 uint256 constant Error_NotOwnedToken_Signature = (0x9705858800000000000000000000000000000000000000000000000000000000);
 uint256 constant Error_NotOperaterable_Signature = (0xce6494fa00000000000000000000000000000000000000000000000000000000);
+
+uint256 constant Error_InvalidSignature_Signature = (0x9c5deda700000000000000000000000000000000000000000000000000000000);
+uint256 constant Error_TimeOut_Signature = (0xf9199e3f00000000000000000000000000000000000000000000000000000000);
 
 // (uint256(keccak256('ERC721yul.tokenIndex')) - 1)[:4]
 uint256 constant Slot_TokenIndex = (0x5015e739);
