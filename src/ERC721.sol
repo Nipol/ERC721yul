@@ -168,6 +168,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
     function _safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata) internal {
         assembly {
+            let freeptr := mload(0x40)
+
             // 현재 토큰 소유자 0xa0에 저장
             mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenInfo)
@@ -236,11 +238,16 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             }
 
             log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
+
+            // restore free memory pointer
+            mstore(0x40, freeptr)
         }
     }
 
     function _safeTransferFrom(address from, address to, uint256 tokenId) internal {
         assembly {
+            let freeptr := mload(0x40)
+
             // 현재 토큰 소유자 0xa0에 저장
             mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenInfo)
@@ -311,11 +318,16 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             }
 
             log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
+
+            // restore free memory pointer
+            mstore(0x40, freeptr)
         }
     }
 
     function _transferFrom(address from, address to, uint256 tokenId) internal {
         assembly {
+            let freeptr := mload(0x40)
+
             // 현재 토큰 소유자 0xa0에 저장
             mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenInfo)
@@ -363,6 +375,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             sstore(tmp_ptr, add(sload(tmp_ptr), 0x1))
 
             log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
+
+            // restore free memory pointer
+            mstore(0x40, freeptr)
         }
     }
 
@@ -373,6 +388,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function _mint(address to) internal {
         assembly {
+            let freeptr := mload(0x40)
+
             // 소유자 밸런스 증가
             mstore(0x0, to)
             mstore(0x20, Slot_OwnerInfo)
@@ -390,6 +407,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             sstore(Slot_TokenIndex, add(mload(0x0), 0x1))
 
             log4(0x0, 0x0, Event_Transfer_Signature, 0x0, to, mload(0x0))
+
+            // restore free memory pointer
+            mstore(0x40, freeptr)
         }
     }
 
@@ -401,6 +421,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function _mint(address to, uint256 quantity) internal {
         assembly {
+            let freeptr := mload(0x40)
+
             // 0x00 현재 토큰 카운터
             mstore(0x20, add(mload(0x0), quantity))
             mstore(0x0, sload(Slot_TokenIndex))
@@ -421,6 +443,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 토큰 카운터 수량만큼 증가
             sstore(Slot_TokenIndex, mload(0x20))
+
+            // restore free memory pointer
+            mstore(0x40, freeptr)
         }
     }
 
@@ -431,6 +456,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function _safemint(address to, bytes calldata) internal {
         assembly {
+            let freeptr := mload(0x40)
+
             // 소유자 밸런스 증가
             mstore(0x0, to)
             mstore(0x20, Slot_OwnerInfo)
@@ -470,6 +497,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                     if iszero(eq(mload(0x0), TokenReceiver_Signature)) { revert(0x0, 0x0) }
                 }
             }
+
+            // restore free memory pointer
+            mstore(0x40, freeptr)
         }
     }
 
@@ -480,6 +510,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function _safeMint(address to, uint256 quantity, bytes calldata) internal {
         assembly {
+            let freeptr := mload(0x40)
+
             // 0x00 현재 토큰 카운터
             mstore(0x0, sload(Slot_TokenIndex))
             // 0x20 더해진 최대 수량
@@ -526,6 +558,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 토큰 카운터 수량만큼 증가
             sstore(Slot_TokenIndex, mload(0x20))
+
+            // restore free memory pointer
+            mstore(0x40, freeptr)
         }
     }
 }
