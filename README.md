@@ -100,34 +100,37 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | test/ERC721Mock.sol:ERC721Mock contract         |                 |        |        |        |         |
 |-------------------------------------------------|-----------------|--------|--------|--------|---------|
 | Deployment Cost                                 | Deployment Size |        |        |        |         |
-| 938383                                          | 4715            |        |        |        |         |
+| 965409                                          | 4850            |        |        |        |         |
 | Function Name                                   | min             | avg    | median | max    | # calls |
 | approve                                         | 4729            | 23401  | 26771  | 28771  | 17      |
-| balanceOf                                       | 574             | 1574   | 1574   | 2574   | 48      |
+| balanceOf                                       | 574             | 1534   | 574    | 2574   | 50      |
 | getApproved                                     | 370             | 1317   | 370    | 2370   | 19      |
 | isApprovedForAll                                | 820             | 1677   | 820    | 2820   | 14      |
-| mint(address)                                   | 68716           | 68716  | 68716  | 68716  | 41      |
+| mint(address)                                   | 51616           | 68318  | 68716  | 68716  | 43      |
 | mint(address,uint256)                           | 117014          | 141122 | 141122 | 165230 | 2       |
-| ownerOf                                         | 480             | 1380   | 480    | 2480   | 40      |
+| ownerOf                                         | 480             | 1358   | 480    | 2480   | 41      |
 | safeMint(address,bytes)                         | 72226           | 72243  | 72233  | 72271  | 3       |
 | safeMint(address,uint256,bytes)                 | 121884          | 121884 | 121884 | 121884 | 1       |
-| safeTransferFrom(address,address,uint256)       | 2666            | 31335  | 35677  | 37580  | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2991            | 32675  | 36069  | 37922  | 17      |
+| safeTransferFrom(address,address,uint256)       | 2690            | 31375  | 35721  | 37628  | 14      |
+| safeTransferFrom(address,address,uint256,bytes) | 3006            | 31579  | 36085  | 37961  | 18      |
 | setApprovalForAll                               | 24531           | 24531  | 24531  | 24531  | 15      |
 | supportsInterface                               | 246             | 278    | 284    | 297    | 4       |
-| transferFrom                                    | 2622            | 22384  | 33621  | 34306  | 5       |
+| transferFrom                                    | 2643            | 22418  | 33656  | 34353  | 5       |
 ```
 
 ```
 | test/ERC4494Mock.sol:ERC4494Mock contract |                 |       |        |       |         |
 |-------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                           | Deployment Size |       |        |       |         |
-| 1158679                                   | 6078            |       |        |       |         |
+| 1187513                                   | 6222            |       |        |       |         |
 | Function Name                             | min             | avg   | median | max   | # calls |
-| DOMAIN_SEPARATOR                          | 317             | 317   | 317    | 317   | 6       |
-| PERMIT_TYPEHASH                           | 295             | 295   | 295    | 295   | 6       |
-| getApproved                               | 370             | 370   | 370    | 370   | 1       |
-| mint                                      | 68804           | 68804 | 68804  | 68804 | 6       |
-| nonces                                    | 423             | 2137  | 2423   | 2423  | 7       |
-| permit                                    | 764             | 7195  | 2870   | 31414 | 6       |
+| DOMAIN_SEPARATOR                          | 317             | 317   | 317    | 317   | 7       |
+| PERMIT_TYPEHASH                           | 295             | 295   | 295    | 295   | 7       |
+| balanceOf                                 | 662             | 662   | 662    | 662   | 2       |
+| getApproved                               | 370             | 370   | 370    | 370   | 2       |
+| mint                                      | 68804           | 68804 | 68804  | 68804 | 7       |
+| nonces                                    | 414             | 1969  | 2414   | 2414  | 9       |
+| ownerOf                                   | 568             | 568   | 568    | 568   | 1       |
+| permit                                    | 759             | 11306 | 4458   | 33698 | 7       |
+| safeTransferFrom                          | 28464           | 28464 | 28464  | 28464 | 1       |
 ```

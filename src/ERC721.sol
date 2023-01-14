@@ -174,9 +174,10 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenInfo)
             let tmp_ptr := keccak256(0x80, 0x40)
+            mstore(0x00, sload(tmp_ptr))
 
             // 저장된 토큰 소유자와 from이 같은지 확인
-            if iszero(eq(and(sload(tmp_ptr), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
+            if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
                 mstore(0x80, Error_NotOwnedToken_Signature)
                 revert(0x80, 0x4)
             }
@@ -203,7 +204,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             if gt(mload(0x80), 0) { sstore(slot_ptr, 0x0) }
 
             // 토큰ID에 대한 새로운 소유자 정보 업데이트
-            sstore(tmp_ptr, to)
+            mstore(0x0c, shl(0x60, to))
+            sstore(tmp_ptr, mload(0x00))
 
             // 토큰 소유자의 밸런스 값을 1 줄인다
             mstore(0x80, from)
@@ -252,9 +254,10 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenInfo)
             let tmp_ptr := keccak256(0x80, 0x40)
+            mstore(0x00, sload(tmp_ptr))
 
             // 저장된 토큰 소유자와 from이 같은지 확인
-            if iszero(eq(and(sload(tmp_ptr), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
+            if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
                 mstore(0x80, Error_NotOwnedToken_Signature)
                 revert(0x80, 0x4)
             }
@@ -281,7 +284,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             if gt(mload(0x80), 0) { sstore(slot_ptr, 0x0) }
 
             // 토큰ID에 대한 새로운 소유자 정보 업데이트
-            sstore(tmp_ptr, to)
+            mstore(0x0c, shl(0x60, to))
+            sstore(tmp_ptr, mload(0x00))
 
             // 토큰 소유자의 밸런스 값을 1 줄인다
             mstore(0x80, from)
@@ -332,9 +336,10 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenInfo)
             let tmp_ptr := keccak256(0x80, 0x40)
+            mstore(0x00, sload(tmp_ptr))
 
             // 저장된 토큰 소유자와 from이 같은지 확인
-            if iszero(eq(and(sload(tmp_ptr), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
+            if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
                 mstore(0x80, Error_NotOwnedToken_Signature)
                 revert(0x80, 0x4)
             }
@@ -361,7 +366,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             if gt(mload(0x80), 0) { sstore(slot_ptr, 0x0) }
 
             // 토큰ID에 대한 새로운 소유자 정보 업데이트
-            sstore(tmp_ptr, to)
+            mstore(0x0c, shl(0x60, to))
+            sstore(tmp_ptr, mload(0x00))
 
             // 토큰 소유자의 밸런스 값을 1 줄인다
             mstore(0x80, from)

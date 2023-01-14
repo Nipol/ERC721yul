@@ -3,10 +3,12 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "./ERC4494Mock.sol";
+import "./Multicall3.sol";
 
 abstract contract ERC4494Bed is Test {
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
 
+    Multicall3 public multicall;
     ERC4494Mock nft;
     address public alice = Address("alice");
     address public bob = Address("bob");
@@ -14,6 +16,7 @@ abstract contract ERC4494Bed is Test {
 
     function setUp() public virtual {
         nft = new ERC4494Mock();
+        multicall = new Multicall3();
         nft.mint(address(0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0));
     }
 
@@ -49,6 +52,55 @@ contract ERC4494Test is ERC4494Bed {
 
         assertEq(nft.nonces(tokenId), nonce + 1);
         assertEq(nft.getApproved(0), alice);
+    }
+
+    function testMulticallable() public {
+        bytes32 permit = nft.PERMIT_TYPEHASH();
+        bytes32 domain = nft.DOMAIN_SEPARATOR();
+        address spender = address(multicall);
+        uint256 tokenId = 0;
+        uint256 deadline = type(uint256).max;
+        uint256 nonce = nft.nonces(tokenId);
+
+        bytes32 Hash = keccak256(
+            abi.encodePacked("\x19\x01", domain, keccak256(abi.encode(permit, spender, tokenId, nonce, deadline)))
+        );
+
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
+        // 0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0 sk
+        (v, r, s) = vm.sign(0x7c299dda7c704f9d474b6ca5d7fee0b490c8decca493b5764541fe5ec6b65114, Hash);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        IMulticall3.Call memory cd1 = IMulticall3.Call({
+            target: address(nft),
+            callData: abi.encodeWithSignature(
+                "permit(address,uint256,uint256,bytes)", address(multicall), tokenId, deadline, signature
+                )
+        });
+
+        IMulticall3.Call memory cd2 = IMulticall3.Call({
+            target: address(nft),
+            callData: abi.encodeWithSignature(
+                "safeTransferFrom(address,address,uint256,bytes)",
+                0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0,
+                alice,
+                tokenId,
+                ""
+                )
+        });
+
+        IMulticall3.Call[] memory cds = new IMulticall3.Call[](2);
+        (cds[0], cds[1]) = (cd1, cd2);
+
+        multicall.aggregate(cds);
+
+        assertEq(nft.nonces(tokenId), nonce + 1);
+        assertEq(nft.getApproved(0), address(0));
+        assertEq(nft.balanceOf(0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0), 0);
+        assertEq(nft.balanceOf(alice), 1);
+        assertEq(nft.ownerOf(0), alice);
     }
 
     function testInvalidSignatureWithLength() public {

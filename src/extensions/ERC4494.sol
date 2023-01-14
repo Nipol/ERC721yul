@@ -24,14 +24,14 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
         DOMAIN_SEPARATOR = hashDomainSeperator(name, version);
     }
 
-    function permit(address spender, uint256 tokenId, uint256 deadline, bytes calldata) external {
+    function permit(address spender, uint256 tokenId, uint256 deadline, bytes calldata signature) external {
         // 런타임 코드에서 불러오기 까다로운 것들 메모리로 로드
         bytes32 permit_typehash = PERMIT_TYPEHASH;
         bytes32 domain_deparator = DOMAIN_SEPARATOR;
 
         assembly {
             // 서명 길이 체크
-            if iszero(eq(calldataload(0x84), 0x41)) {
+            if iszero(eq(signature.length, 0x41)) {
                 mstore(0x0, Error_InvalidSignature_Signature)
                 revert(0x0, 0x4)
             }
@@ -41,7 +41,6 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
                 mstore(0x0, Error_TimeOut_Signature)
                 revert(0x0, 0x4)
             }
-            let pre := "\x19\x01"
             let memPtr := mload(0x40)
 
             mstore(Permit_ptr, Slot_TokenInfo)
@@ -60,7 +59,7 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
 
             // 앞의 데이터를 먼저 끝에 넣음
             mstore(0x62, keccak256(Permit_ptr, 0xa0))
-            mstore(Permit_ptr, pre)
+            mstore(Permit_ptr, "\x19\x01")
             mstore(0x42, domain_deparator)
 
             mstore(Permit_ptr, keccak256(Permit_ptr, 0x42))
@@ -77,9 +76,11 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
 
             pop(staticcall(gas(), 0x01, Permit_ptr, 0x80, Permit_ptr, 0x20))
 
-            // 실제 소유자와 주소가 다른 경우
+            // 실제 소유자와 주소가 다른 경우, 반환 주소가 없거나 0x0인 경우.
             if or(
-                iszero(eq(and(mload(Permit_tokenInfo_ptr), 0xffffffffffffffffffffffffffffffffffffffff), mload(Permit_ptr))),
+                iszero(
+                    eq(and(mload(Permit_tokenInfo_ptr), 0xffffffffffffffffffffffffffffffffffffffff), mload(Permit_ptr))
+                ),
                 iszero(returndatasize())
             ) {
                 mstore(0x0, Error_InvalidSignature_Signature)
@@ -91,7 +92,10 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
             sstore(keccak256(Permit_tokenId_ptr, 0x40), spender)
 
             // nonce 증가
-            sstore(pos, add(mload(Permit_tokenInfo_ptr), 0x0000000000000000000000010000000000000000000000000000000000000000))
+            sstore(
+                pos,
+                add(mload(Permit_tokenInfo_ptr), 0x0000000000000000000000010000000000000000000000000000000000000000)
+            )
 
             // 토큰 인포에서 소유자 정보 넣어줘야 함
             log4(
@@ -110,18 +114,10 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
 
     function nonces(uint256 tokenId) external view returns (uint256) {
         assembly {
-            mstore(0xa0, Slot_TokenInfo)
-            mstore(0x80, tokenId)
-            mstore(
-                0x80,
-                shr(
-                    0xA0,
-                    and(
-                        sload(keccak256(0x80, 0x40)), 0xffffffffffffffffffffffff0000000000000000000000000000000000000000
-                    )
-                )
-            )
-            return(0x80, 0x20)
+            mstore(0x20, Slot_TokenInfo)
+            mstore(0x00, tokenId)
+            mstore(0x00, shr(0xA0, sload(keccak256(0x00, 0x40))))
+            return(0x00, 0x20)
         }
     }
 

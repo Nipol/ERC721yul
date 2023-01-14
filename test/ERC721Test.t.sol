@@ -4,6 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import { ERC721Mock as ERC721, IERC721, IERC721Metadata, IERC165 } from "./ERC721Mock.sol";
 import "../src/IERC721TokenReceiver.sol";
+import "./Multicall3.sol";
 
 contract Receiver is IERC721TokenReceiver {
     function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
@@ -30,6 +31,7 @@ abstract contract ERC721Bed is Test {
 
     event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
+    Multicall3 public multicall;
     ERC721 public erc721;
     address public receiver;
     address public wreceiver;
@@ -39,6 +41,7 @@ abstract contract ERC721Bed is Test {
     address public charlie = Address("charlie");
 
     function setUp() public virtual {
+        multicall = new Multicall3();
         erc721 = new ERC721();
         receiver = address(new Receiver());
         wreceiver = address(new WrongReceiver());
@@ -60,7 +63,7 @@ contract ERC721Deployed is ERC721Bed {
     }
 
     function testSafeMintToReceiverContract() public {
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(address(0), receiver, 0);
         erc721.safeMint(receiver, "deadbeef");
         assertEq(erc721.balanceOf(receiver), 1);
@@ -153,14 +156,14 @@ contract ERC721Deployed is ERC721Bed {
 
     function testSetApprovalForAll() public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, false);
+        vm.expectEmit(true, true, true, false, address(erc721));
         emit ApprovalForAll(alice, bob, true);
         erc721.setApprovalForAll(bob, true);
         assertEq(erc721.isApprovedForAll(alice, bob), true);
     }
 
     function testSetApprovalForAllFromContract() public {
-        vm.expectEmit(true, true, true, false);
+        vm.expectEmit(true, true, true, false, address(erc721));
         emit ApprovalForAll(address(this), bob, true);
         erc721.setApprovalForAll(bob, true);
         assertEq(erc721.isApprovedForAll(address(this), bob), true);
@@ -196,9 +199,33 @@ contract ERC721Minted is ERC721Bed {
         erc721.mint(alice);
     }
 
+    function testMulticallable() public {
+        erc721.mint(address(multicall));
+
+        IMulticall3.Call memory cd1 = IMulticall3.Call({
+            target: address(erc721),
+            callData: abi.encodeWithSignature(
+                "safeTransferFrom(address,address,uint256,bytes)",
+                address(multicall),
+                alice,
+                1,
+                "Hello world this is test for properly calldata parse."
+                )
+        });
+
+        IMulticall3.Call[] memory cds = new IMulticall3.Call[](1);
+        (cds[0]) = (cd1);
+
+        multicall.aggregate(cds);
+
+        assertEq(erc721.balanceOf(alice), 2);
+        assertEq(erc721.balanceOf(address(multicall)), 0);
+        assertEq(erc721.ownerOf(1), alice);
+    }
+
     function testSafeTransferFromWithData() public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, bob, 0);
         erc721.safeTransferFrom(alice, bob, 0, "");
         assertEq(erc721.balanceOf(alice), 0);
@@ -216,7 +243,7 @@ contract ERC721Minted is ERC721Bed {
 
     function testFuzzSafeTransferFromWithData(bytes calldata cd) public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0, cd);
         assertEq(erc721.balanceOf(alice), 0);
@@ -226,7 +253,7 @@ contract ERC721Minted is ERC721Bed {
 
     function testSafeTransferFromWithDataToReceiverContract() public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0, abi.encode("hello world"));
         assertEq(erc721.balanceOf(alice), 0);
@@ -254,7 +281,7 @@ contract ERC721Minted is ERC721Bed {
 
     function testSafeTransferFrom() public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, bob, 0);
         erc721.safeTransferFrom(alice, bob, 0);
         assertEq(erc721.balanceOf(alice), 0);
@@ -272,7 +299,7 @@ contract ERC721Minted is ERC721Bed {
 
     function testSafeTransferFromToReceiverContract() public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0);
         assertEq(erc721.balanceOf(alice), 0);
@@ -300,7 +327,7 @@ contract ERC721Minted is ERC721Bed {
 
     function testTransferFrom() public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, bob, 0);
         erc721.transferFrom(alice, bob, 0);
         assertEq(erc721.balanceOf(alice), 0);
@@ -318,7 +345,7 @@ contract ERC721Minted is ERC721Bed {
 
     function testApprove() public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Approval(alice, bob, 0);
         erc721.approve(bob, 0);
         assertEq(erc721.getApproved(0), bob);
@@ -343,7 +370,7 @@ contract ERC721Approver is ERC721Bed {
 
     function testSafeTransferFromWithData() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, charlie, 0);
         erc721.safeTransferFrom(alice, charlie, 0, "");
         assertEq(erc721.balanceOf(alice), 0);
@@ -354,7 +381,7 @@ contract ERC721Approver is ERC721Bed {
 
     function testFuzzSafeTransferFromWithData(bytes calldata cd) public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0, cd);
         assertEq(erc721.balanceOf(alice), 0);
@@ -365,7 +392,7 @@ contract ERC721Approver is ERC721Bed {
 
     function testSafeTransferFromWithDataToReceiverContract() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0, abi.encode("hello world"));
         assertEq(erc721.getApproved(0), address(0));
@@ -387,7 +414,7 @@ contract ERC721Approver is ERC721Bed {
 
     function testSafeTransferFrom() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, charlie, 0);
         erc721.safeTransferFrom(alice, charlie, 0);
         assertEq(erc721.getApproved(0), address(0));
@@ -395,7 +422,7 @@ contract ERC721Approver is ERC721Bed {
 
     function testSafeTransferFromToReceiverContract() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0);
         assertEq(erc721.getApproved(0), address(0));
@@ -417,7 +444,7 @@ contract ERC721Approver is ERC721Bed {
 
     function testTransferFrom() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, bob, 0);
         erc721.transferFrom(alice, bob, 0);
         assertEq(erc721.getApproved(0), address(0));
@@ -425,7 +452,7 @@ contract ERC721Approver is ERC721Bed {
 
     function testApprove() public {
         vm.prank(alice);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Approval(alice, bob, 0);
         erc721.approve(bob, 0);
         assertEq(erc721.getApproved(0), bob);
@@ -446,7 +473,7 @@ contract ERC721Operator is ERC721Bed {
 
     function testSafeTransferFromWithData() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, charlie, 0);
         erc721.safeTransferFrom(alice, charlie, 0, "");
         assertEq(erc721.balanceOf(alice), 0);
@@ -457,7 +484,7 @@ contract ERC721Operator is ERC721Bed {
 
     function testFuzzSafeTransferFromWithData(bytes calldata cd) public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0, cd);
         assertEq(erc721.balanceOf(alice), 0);
@@ -468,7 +495,7 @@ contract ERC721Operator is ERC721Bed {
 
     function testSafeTransferFromWithDataToReceiverContract() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0, abi.encode("hello world"));
         assertEq(erc721.isApprovedForAll(alice, charlie), true);
@@ -490,7 +517,7 @@ contract ERC721Operator is ERC721Bed {
 
     function testSafeTransferFrom() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, charlie, 0);
         erc721.safeTransferFrom(alice, charlie, 0);
         assertEq(erc721.isApprovedForAll(alice, charlie), true);
@@ -498,7 +525,7 @@ contract ERC721Operator is ERC721Bed {
 
     function testSafeTransferFromToReceiverContract() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, receiver, 0);
         erc721.safeTransferFrom(alice, receiver, 0);
         assertEq(erc721.isApprovedForAll(alice, charlie), true);
@@ -520,7 +547,7 @@ contract ERC721Operator is ERC721Bed {
 
     function testTransferFrom() public {
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, bob, 0);
         erc721.transferFrom(alice, bob, 0);
         assertEq(erc721.isApprovedForAll(alice, charlie), true);
@@ -529,7 +556,7 @@ contract ERC721Operator is ERC721Bed {
     function testApprove() public {
         assertEq(erc721.getApproved(0), address(0));
         vm.prank(charlie);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, true, true, true, address(erc721));
         emit Approval(alice, bob, 0);
         erc721.approve(bob, 0);
         assertEq(erc721.getApproved(0), bob);
