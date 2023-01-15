@@ -24,7 +24,7 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      * @param   to      토큰 수신자 주소
      * @param   tokenId 전송할 토큰의 ID
      */
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external payable {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external payable virtual {
         _safeTransferFrom(from, to, tokenId, data);
     }
 
@@ -34,7 +34,7 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      * @param   to      토큰 수신자 주소
      * @param   tokenId 전송할 토큰의 ID
      */
-    function safeTransferFrom(address from, address to, uint256 tokenId) external payable {
+    function safeTransferFrom(address from, address to, uint256 tokenId) external payable virtual {
         _safeTransferFrom(from, to, tokenId);
     }
 
@@ -44,7 +44,7 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      * @param   to      토큰 수신자 주소
      * @param   tokenId 전송할 토큰의 ID
      */
-    function transferFrom(address from, address to, uint256 tokenId) external payable {
+    function transferFrom(address from, address to, uint256 tokenId) external payable virtual {
         _transferFrom(from, to, tokenId);
     }
 
