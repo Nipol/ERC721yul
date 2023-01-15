@@ -112,7 +112,7 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | safeMint(address,bytes)                         | 72226           | 72243  | 72233  | 72271  | 3       |
 | safeMint(address,uint256,bytes)                 | 121884          | 121884 | 121884 | 121884 | 1       |
 | safeTransferFrom(address,address,uint256)       | 2690            | 31375  | 35721  | 37628  | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 3006            | 31579  | 36085  | 37961  | 18      |
+| safeTransferFrom(address,address,uint256,bytes) | 3006            | 31578  | 36085  | 37961  | 18      |
 | setApprovalForAll                               | 24531           | 24531  | 24531  | 24531  | 15      |
 | supportsInterface                               | 246             | 278    | 284    | 297    | 4       |
 | transferFrom                                    | 2643            | 22418  | 33656  | 34353  | 5       |
@@ -122,7 +122,7 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | test/ERC4494Mock.sol:ERC4494Mock contract |                 |       |        |       |         |
 |-------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                           | Deployment Size |       |        |       |         |
-| 1187513                                   | 6222            |       |        |       |         |
+| 1185106                                   | 6210            |       |        |       |         |
 | Function Name                             | min             | avg   | median | max   | # calls |
 | DOMAIN_SEPARATOR                          | 317             | 317   | 317    | 317   | 7       |
 | PERMIT_TYPEHASH                           | 295             | 295   | 295    | 295   | 7       |
@@ -131,6 +131,6 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | mint                                      | 68804           | 68804 | 68804  | 68804 | 7       |
 | nonces                                    | 414             | 1969  | 2414   | 2414  | 9       |
 | ownerOf                                   | 568             | 568   | 568    | 568   | 1       |
-| permit                                    | 759             | 11306 | 4458   | 33698 | 7       |
+| permit                                    | 759             | 10650 | 4452   | 31409 | 7       |
 | safeTransferFrom                          | 28464           | 28464 | 28464  | 28464 | 1       |
 ```

@@ -24,6 +24,13 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
         DOMAIN_SEPARATOR = hashDomainSeperator(name, version);
     }
 
+    /**
+     * @notice  소유자의 서명으로 approve를 수행하는 함수
+     * @param   spender     approve 대상 주소
+     * @param   tokenId     spender가 사용할 토큰 아이디
+     * @param   deadline    permit의 만료시간 타임스탬프
+     * @param   signature   서명 데이터
+     */
     function permit(address spender, uint256 tokenId, uint256 deadline, bytes calldata signature) external {
         // 런타임 코드에서 불러오기 까다로운 것들 메모리로 로드
         bytes32 permit_typehash = PERMIT_TYPEHASH;
@@ -112,6 +119,11 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
         }
     }
 
+    /**
+     * @notice  NFT의 nonce를 반환하는 함수, permit를 구성할 때 사용
+     * @param   tokenId nonce를 조회하고자 하는 NFT 아이디
+     * @return  nonce uint256으로 반환
+     */
     function nonces(uint256 tokenId) external view returns (uint256) {
         assembly {
             mstore(0x20, Slot_TokenInfo)
@@ -122,10 +134,10 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
     }
 
     /**
-     * @dev     Calculates a EIP712 domain separator.
-     * @param   name                EIP712 domain name.
-     * @param   version             EIP712 domain version.
-     * @return  result              EIP712 domain separator.
+     * @dev     EIP712 domain separator 계산하는 함수
+     * @param   name    EIP712 도메인 네임.
+     * @param   version EIP712 도메인 버전.
+     * @return  result  EIP712 domain separator.
      */
     function hashDomainSeperator(string memory name, string memory version) private view returns (bytes32 result) {
         bytes32 typehash = EIP712DOMAIN_TYPEHASH;
