@@ -1,11 +1,18 @@
-pragma solidity ^0.8.13;
+/**
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+pragma solidity ^0.8.0;
 
 import "ERC721/ERC721.sol";
+import "ERC721/extensions/ERC4494.sol";
 
-contract ERC721Mock is ERC721 {
-    string public constant name = "NFT NAME";
-    string public constant symbol = "NFT SYMBOL";
+contract ERC4494Mock is ERC4494, ERC721 {
+    string public constant name = "NFT Permit";
+    string public constant symbol = "NFT Permit";
+    string public constant version = "1";
     string public constant baseURI = "ipfs://";
+
+    constructor() ERC4494(name, version) { }
 
     function mint(address to) external {
         _mint(to);
