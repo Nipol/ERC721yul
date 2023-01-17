@@ -120,6 +120,16 @@ contract ERC721Deployed is ERC721Bed {
         assertEq(erc721.ownerOf(5), address(0));
     }
 
+    function testBulkMintWithConstantly() public {
+        erc721.mint(alice, 2);
+        erc721.mint(alice, 2);
+        assertEq(erc721.balanceOf(alice), 4);
+        assertEq(erc721.ownerOf(0), alice);
+        assertEq(erc721.ownerOf(1), alice);
+        assertEq(erc721.ownerOf(2), alice);
+        assertEq(erc721.ownerOf(3), alice);
+    }
+
     function testSafeTransferFromWithData() public {
         vm.prank(alice);
         vm.expectRevert(bytes4(keccak256("ERC721_NotOwnedToken()")));
