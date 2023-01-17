@@ -439,9 +439,6 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             let PoS := keccak256(0x40, 0x40)
             sstore(PoS, add(sload(PoS), quantity))
 
-            log1(0,0,mload(0x0))
-            log1(0,0,mload(0x20))
-
             for { let tokenId := mload(0x0) } iszero(eq(tokenId, mload(0x20))) { tokenId := add(tokenId, 0x01) } {
                 // 저장된 토큰 카운터에 해당하는 정보 저장.
                 mstore(0x40, tokenId)
