@@ -9,12 +9,13 @@ uint256 constant BalanceOf_length = 0x20;
 
 uint256 constant Approve_ptr = 0x00;
 uint256 constant Approve_next_ptr = 0x20;
-uint256 constant Approve_Operator_ptr = 0x40;
-uint256 constant Approve_Operator_next_ptr = 0x60;
-uint256 constant Approve_Owner_ptr = 0x80;
+uint256 constant Approve_Operator_owner_ptr = 0x40;
+uint256 constant Approve_Operator_operator_ptr = 0x60;
+uint256 constant Approve_Operator_slot_ptr = 0x80;
 
-uint256 constant OperatorApproval_ptr = 0x00;
-uint256 constant OperatorApproval_next_ptr = 0x20;
+uint256 constant OperatorApproval_owner_ptr = 0x00;
+uint256 constant OperatorApproval_operator_ptr = 0x20;
+uint256 constant OperatorApproval_slot_ptr = 0x40;
 
 uint256 constant Permit_tokenInfo_ptr = 0x00;
 uint256 constant Permit_tokenId_ptr = 0x20;
@@ -69,5 +70,7 @@ uint256 constant Slot_OwnerInfo = (0xe397be3c);
 // (uint256(keccak256('ERC721yul.tokenAllowance')) - 1)[:4]
 uint256 constant Slot_TokenAllowance = (0xccea0117);
 
+// Prototype
+// `mapping(address => mapping(address => bool))` to `let slot := abi.encodePacked(slot + address + address)`
 // (uint256(keccak256('ERC721yul.operatorApprovals')) - 1)[:4]
 uint256 constant Slot_OperatorApprovals = (0xff81a518);

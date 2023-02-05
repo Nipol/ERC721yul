@@ -63,17 +63,14 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             mstore(Approve_ptr, tokenId)
             mstore(Approve_next_ptr, Slot_TokenInfo)
             mstore(
-                Approve_Owner_ptr, and(sload(keccak256(Approve_ptr, 0x40)), 0xffffffffffffffffffffffffffffffffffffffff)
+                Approve_Operator_owner_ptr, and(sload(keccak256(Approve_ptr, 0x40)), 0xffffffffffffffffffffffffffffffffffffffff)
             )
 
             // 토큰 소유자가 허용한 오퍼레이터인지 확인
-            mstore(Approve_Operator_ptr, mload(Approve_Owner_ptr))
-            mstore(Approve_Operator_next_ptr, Slot_OperatorApprovals)
-            mstore(Approve_Operator_next_ptr, keccak256(Approve_Operator_ptr, 0x40))
-            mstore(Approve_Operator_ptr, caller())
-            mstore(Approve_Operator_ptr, sload(keccak256(Approve_Operator_ptr, 0x40)))
+            mstore(Approve_Operator_operator_ptr, caller())
+            mstore(Approve_Operator_slot_ptr, Slot_OperatorApprovals)
 
-            switch or(eq(caller(), mload(Approve_Owner_ptr)), mload(Approve_Operator_ptr))
+            switch or(sload(keccak256(Approve_Operator_owner_ptr, 0x60)), eq(caller(), mload(Approve_Operator_owner_ptr)))
             case true {
                 mstore(Approve_ptr, tokenId)
                 mstore(Approve_next_ptr, Slot_TokenAllowance)
@@ -84,7 +81,7 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                 revert(0x1c, 0x4)
             }
 
-            log4(0x0, 0x0, Event_Approval_Signature, mload(Approve_Owner_ptr), approved, tokenId)
+            log4(0x0, 0x0, Event_Approval_Signature, mload(Approve_Operator_owner_ptr), approved, tokenId)
         }
     }
 
@@ -95,11 +92,10 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function setApprovalForAll(address operator, bool approved) external {
         assembly {
-            mstore(OperatorApproval_ptr, caller())
-            mstore(OperatorApproval_next_ptr, Slot_OperatorApprovals)
-            mstore(OperatorApproval_next_ptr, keccak256(OperatorApproval_ptr, 0x40))
-            mstore(OperatorApproval_ptr, operator)
-            sstore(keccak256(OperatorApproval_ptr, 0x40), approved)
+            mstore(OperatorApproval_slot_ptr, Slot_OperatorApprovals)
+            mstore(OperatorApproval_operator_ptr, operator)
+            mstore(OperatorApproval_owner_ptr, caller())
+            sstore(keccak256(OperatorApproval_owner_ptr, 0x60), approved)
 
             mstore(0x0, approved)
             log3(0x0, 0x20, Event_ApprovalForAll_Signature, caller(), operator)
@@ -127,12 +123,11 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function isApprovedForAll(address owner, address operator) external view returns (bool) {
         assembly {
-            mstore(OperatorApproval_ptr, owner)
-            mstore(OperatorApproval_next_ptr, Slot_OperatorApprovals)
-            mstore(OperatorApproval_next_ptr, keccak256(OperatorApproval_ptr, 0x40))
-            mstore(OperatorApproval_ptr, operator)
-            mstore(OperatorApproval_ptr, sload(keccak256(OperatorApproval_ptr, 0x40)))
-            return(OperatorApproval_ptr, 0x20)
+            mstore(OperatorApproval_slot_ptr, Slot_OperatorApprovals)
+            mstore(OperatorApproval_operator_ptr, operator)
+            mstore(OperatorApproval_owner_ptr, owner)
+            mstore(OperatorApproval_owner_ptr, sload(keccak256(OperatorApproval_owner_ptr, 0x60)))
+            return(OperatorApproval_owner_ptr, 0x20)
         }
     }
 
@@ -193,10 +188,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 현재 토큰에 대한 Operator가 존재한다면 0x40에 불리언 값을 저장한다.
             mstore(0xc0, from)
-            mstore(0xe0, Slot_OperatorApprovals)
-            mstore(0xe0, keccak256(0xc0, 0x40))
-            mstore(0xc0, caller())
-            mstore(0xc0, sload(keccak256(0xc0, 0x40)))
+            mstore(0xe0, caller())
+            mstore(0x100, Slot_OperatorApprovals)
+            mstore(0xc0, sload(keccak256(0xc0, 0x60)))
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
             if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
@@ -273,10 +267,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 현재 토큰에 대한 Operator가 존재한다면 0x40에 불리언 값을 저장한다.
             mstore(0xc0, from)
-            mstore(0xe0, Slot_OperatorApprovals)
-            mstore(0xe0, keccak256(0xc0, 0x40))
-            mstore(0xc0, caller())
-            mstore(0xc0, sload(keccak256(0xc0, 0x40)))
+            mstore(0xe0, caller())
+            mstore(0x100, Slot_OperatorApprovals)
+            mstore(0xc0, sload(keccak256(0xc0, 0x60)))
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
             if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
@@ -355,10 +348,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 현재 토큰에 대한 Operator가 존재한다면 0x40에 불리언 값을 저장한다.
             mstore(0xc0, from)
-            mstore(0xe0, Slot_OperatorApprovals)
-            mstore(0xe0, keccak256(0xc0, 0x40))
-            mstore(0xc0, caller())
-            mstore(0xc0, sload(keccak256(0xc0, 0x40)))
+            mstore(0xe0, caller())
+            mstore(0x100, Slot_OperatorApprovals)
+            mstore(0xc0, sload(keccak256(0xc0, 0x60)))
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
             if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
