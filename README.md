@@ -100,37 +100,37 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | test/ERC721Mock.sol:ERC721Mock contract         |                 |        |        |        |         |
 |-------------------------------------------------|-----------------|--------|--------|--------|---------|
 | Deployment Cost                                 | Deployment Size |        |        |        |         |
-| 965409                                          | 4850            |        |        |        |         |
+| 944190                                          | 4744            |        |        |        |         |
 | Function Name                                   | min             | avg    | median | max    | # calls |
-| approve                                         | 4729            | 23401  | 26771  | 28771  | 17      |
-| balanceOf                                       | 574             | 1534   | 574    | 2574   | 50      |
-| getApproved                                     | 370             | 1317   | 370    | 2370   | 19      |
-| isApprovedForAll                                | 820             | 1677   | 820    | 2820   | 14      |
-| mint(address)                                   | 51616           | 68318  | 68716  | 68716  | 43      |
-| mint(address,uint256)                           | 117014          | 141122 | 141122 | 165230 | 2       |
-| ownerOf                                         | 480             | 1358   | 480    | 2480   | 41      |
-| safeMint(address,bytes)                         | 72226           | 72243  | 72233  | 72271  | 3       |
-| safeMint(address,uint256,bytes)                 | 121884          | 121884 | 121884 | 121884 | 1       |
-| safeTransferFrom(address,address,uint256)       | 2690            | 31375  | 35721  | 37628  | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 3006            | 31578  | 36085  | 37961  | 18      |
-| setApprovalForAll                               | 24531           | 24531  | 24531  | 24531  | 15      |
-| supportsInterface                               | 246             | 278    | 284    | 297    | 4       |
-| transferFrom                                    | 2643            | 22418  | 33656  | 34353  | 5       |
+| approve                                         | 4722            | 23394  | 26764  | 28764  | 17      |
+| balanceOf                                       | 567             | 1508   | 567    | 2567   | 51      |
+| getApproved                                     | 363             | 1310   | 363    | 2363   | 19      |
+| isApprovedForAll                                | 815             | 1672   | 815    | 2815   | 14      |
+| mint(address)                                   | 51609           | 68311  | 68709  | 68709  | 43      |
+| mint(address,uint256)                           | 49092           | 106050 | 104946 | 165216 | 4       |
+| ownerOf                                         | 473             | 1273   | 473    | 2473   | 45      |
+| safeMint(address,bytes)                         | 72219           | 72236  | 72226  | 72264  | 3       |
+| safeMint(address,uint256,bytes)                 | 121877          | 121877 | 121877 | 121877 | 1       |
+| safeTransferFrom(address,address,uint256)       | 2683            | 31368  | 35714  | 37621  | 14      |
+| safeTransferFrom(address,address,uint256,bytes) | 2999            | 31572  | 36078  | 37954  | 18      |
+| setApprovalForAll                               | 24524           | 24524  | 24524  | 24524  | 15      |
+| supportsInterface                               | 244             | 276    | 282    | 295    | 4       |
+| transferFrom                                    | 2636            | 22411  | 33651  | 34346  | 5       |
 ```
 
 ```
 | test/ERC4494Mock.sol:ERC4494Mock contract |                 |       |        |       |         |
 |-------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                           | Deployment Size |       |        |       |         |
-| 1185106                                   | 6210            |       |        |       |         |
+| 1158875                                   | 6041            |       |        |       |         |
 | Function Name                             | min             | avg   | median | max   | # calls |
-| DOMAIN_SEPARATOR                          | 317             | 317   | 317    | 317   | 7       |
-| PERMIT_TYPEHASH                           | 295             | 295   | 295    | 295   | 7       |
-| balanceOf                                 | 662             | 662   | 662    | 662   | 2       |
-| getApproved                               | 370             | 370   | 370    | 370   | 2       |
-| mint                                      | 68804           | 68804 | 68804  | 68804 | 7       |
-| nonces                                    | 414             | 1969  | 2414   | 2414  | 9       |
-| ownerOf                                   | 568             | 568   | 568    | 568   | 1       |
-| permit                                    | 759             | 10650 | 4452   | 31409 | 7       |
-| safeTransferFrom                          | 28464           | 28464 | 28464  | 28464 | 1       |
+| DOMAIN_SEPARATOR                          | 310             | 310   | 310    | 310   | 7       |
+| PERMIT_TYPEHASH                           | 288             | 288   | 288    | 288   | 7       |
+| balanceOf                                 | 655             | 655   | 655    | 655   | 2       |
+| getApproved                               | 363             | 363   | 363    | 363   | 2       |
+| mint                                      | 68797           | 68797 | 68797  | 68797 | 7       |
+| nonces                                    | 407             | 1962  | 2407   | 2407  | 9       |
+| ownerOf                                   | 561             | 561   | 561    | 561   | 1       |
+| permit                                    | 752             | 10643 | 4445   | 31402 | 7       |
+| safeTransferFrom                          | 28459           | 28459 | 28459  | 28459 | 1       |
 ```
