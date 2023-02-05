@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "./IERC4494.sol";
 import "./IEIP712.sol";
@@ -40,13 +40,13 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
             // 서명 길이 체크
             if iszero(eq(signature.length, 0x41)) {
                 mstore(0x0, Error_InvalidSignature_Signature)
-                revert(0x0, 0x4)
+                revert(0x1c, 0x4)
             }
 
             // deadline check
             if or(eq(timestamp(), deadline), gt(timestamp(), deadline)) {
                 mstore(0x0, Error_TimeOut_Signature)
-                revert(0x0, 0x4)
+                revert(0x1c, 0x4)
             }
             let memPtr := mload(0x40)
 
@@ -78,7 +78,7 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
             // check malleability
             if gt(mload(0xa0), Signature_s_malleability) {
                 mstore(0x0, Error_InvalidSignature_Signature)
-                revert(0x0, 0x4)
+                revert(0x1c, 0x4)
             }
 
             pop(staticcall(gas(), 0x01, Permit_ptr, 0x80, Permit_ptr, 0x20))
@@ -91,7 +91,7 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
                 iszero(returndatasize())
             ) {
                 mstore(0x0, Error_InvalidSignature_Signature)
-                revert(0x0, 0x4)
+                revert(0x1c, 0x4)
             }
 
             // force approve

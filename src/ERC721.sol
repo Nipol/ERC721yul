@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.4;
 
 import "./Constants.sol";
 import "./IERC165.sol";
@@ -24,7 +24,11 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      * @param   to      토큰 수신자 주소
      * @param   tokenId 전송할 토큰의 ID
      */
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data) external payable virtual {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data)
+        external
+        payable
+        virtual
+    {
         _safeTransferFrom(from, to, tokenId, data);
     }
 
@@ -76,8 +80,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                 sstore(keccak256(Approve_ptr, 0x40), approved)
             }
             default {
-                mstore(0x40, Error_NotOwnedToken_Signature)
-                revert(0x40, 0x4)
+                mstore(0x0, Error_NotOwnedToken_Signature)
+                revert(0x1c, 0x4)
             }
 
             log4(0x0, 0x0, Event_Approval_Signature, mload(Approve_Owner_ptr), approved, tokenId)
@@ -146,7 +150,7 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
     }
 
     /**
-     * @notice 소유자의 주소를 입력받아, 해당 소유자가 가지고 있는 토큰의 수량을 반환한다.
+     * @notice  소유자의 주소를 입력받아, 해당 소유자가 가지고 있는 토큰의 수량을 반환한다.
      * @param   owner   토큰 소유자
      * @return  소유하고 있는 수량
      */
@@ -178,8 +182,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 저장된 토큰 소유자와 from이 같은지 확인
             if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
-                mstore(0x80, Error_NotOwnedToken_Signature)
-                revert(0x80, 0x4)
+                mstore(0x0, Error_NotOwnedToken_Signature)
+                revert(0x1c, 0x4)
             }
 
             // 현재 토큰의 approve된 유저 정보를 0x80에 저장.
@@ -196,8 +200,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
             if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
-                mstore(0x80, Error_NotOperaterable_Signature)
-                revert(0x80, 0x4)
+                mstore(0x0, Error_NotOperaterable_Signature)
+                revert(0x1c, 0x4)
             }
 
             // approved가 0 이라면 굳이 초기화 하진 않는다.
@@ -258,8 +262,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 저장된 토큰 소유자와 from이 같은지 확인
             if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
-                mstore(0x80, Error_NotOwnedToken_Signature)
-                revert(0x80, 0x4)
+                mstore(0x0, Error_NotOwnedToken_Signature)
+                revert(0x1c, 0x4)
             }
 
             // 현재 토큰의 approve된 유저 정보를 0x80에 저장하고 0으로 만든다.
@@ -276,8 +280,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
             if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
-                mstore(0x80, Error_NotOperaterable_Signature)
-                revert(0x80, 0x4)
+                mstore(0x0, Error_NotOperaterable_Signature)
+                revert(0x1c, 0x4)
             }
 
             // approved가 0 이라면 굳이 초기화 하진 않는다.
@@ -340,8 +344,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 저장된 토큰 소유자와 from이 같은지 확인
             if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
-                mstore(0x80, Error_NotOwnedToken_Signature)
-                revert(0x80, 0x4)
+                mstore(0x0, Error_NotOwnedToken_Signature)
+                revert(0x1c, 0x4)
             }
 
             // 현재 토큰의 approve된 유저 정보를 0x80에 저장하고 0으로 만든다.
@@ -358,8 +362,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
             if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
-                mstore(0x80, Error_NotOperaterable_Signature)
-                revert(0x80, 0x4)
+                mstore(0x0, Error_NotOperaterable_Signature)
+                revert(0x1c, 0x4)
             }
 
             // approved가 0 이라면 굳이 초기화 하진 않는다.
