@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "ERC721/ERC721.sol";
 import "ERC721/extensions/ERC4494.sol";

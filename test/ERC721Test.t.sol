@@ -1,5 +1,7 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+/**
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+pragma solidity ^0.8.4;
 
 import "forge-std/Test.sol";
 import { ERC721Mock as ERC721, IERC721, IERC721Metadata, IERC165 } from "./ERC721Mock.sol";
