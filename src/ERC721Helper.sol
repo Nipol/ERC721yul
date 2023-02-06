@@ -16,7 +16,6 @@ contract ERC721Helper {
             mstore(0x0, sload(Slot_TokenIndex))
             return(0x0, 0x20)
         }
-
     }
 
     /**

@@ -19,7 +19,7 @@ abstract contract ERC4494Bed is Test {
     function setUp() public virtual {
         nft = new ERC4494Mock();
         multicall = new Multicall3();
-        nft.mint(address(0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0));
+        nft.mint(address(0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0), 721);
     }
 
     function Address(string memory name) internal returns (address ret) {
@@ -33,7 +33,7 @@ contract ERC4494Test is ERC4494Bed {
         bytes32 permit = nft.PERMIT_TYPEHASH();
         bytes32 domain = nft.DOMAIN_SEPARATOR();
         address spender = alice;
-        uint256 tokenId = 0;
+        uint256 tokenId = 721;
         uint256 deadline = type(uint256).max;
         uint256 nonce = nft.nonces(tokenId);
 
@@ -49,18 +49,18 @@ contract ERC4494Test is ERC4494Bed {
         bytes memory signature = abi.encodePacked(r, s, v);
 
         vm.expectEmit(true, true, true, true);
-        emit Approval(address(0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0), alice, 0);
+        emit Approval(address(0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0), alice, tokenId);
         nft.permit(alice, tokenId, deadline, signature);
 
         assertEq(nft.nonces(tokenId), nonce + 1);
-        assertEq(nft.getApproved(0), alice);
+        assertEq(nft.getApproved(tokenId), alice);
     }
 
     function testMulticallable() public {
         bytes32 permit = nft.PERMIT_TYPEHASH();
         bytes32 domain = nft.DOMAIN_SEPARATOR();
         address spender = address(multicall);
-        uint256 tokenId = 0;
+        uint256 tokenId = 721;
         uint256 deadline = type(uint256).max;
         uint256 nonce = nft.nonces(tokenId);
 
@@ -99,17 +99,17 @@ contract ERC4494Test is ERC4494Bed {
         multicall.aggregate(cds);
 
         assertEq(nft.nonces(tokenId), nonce + 1);
-        assertEq(nft.getApproved(0), address(0));
+        assertEq(nft.getApproved(tokenId), address(0));
         assertEq(nft.balanceOf(0x22310Bf73bC88ae2D2c9a29Bd87bC38FBAc9e6b0), 0);
         assertEq(nft.balanceOf(alice), 1);
-        assertEq(nft.ownerOf(0), alice);
+        assertEq(nft.ownerOf(tokenId), alice);
     }
 
     function testInvalidSignatureWithLength() public {
         bytes32 permit = nft.PERMIT_TYPEHASH();
         bytes32 domain = nft.DOMAIN_SEPARATOR();
         address spender = alice;
-        uint256 tokenId = 0;
+        uint256 tokenId = 721;
         uint256 deadline = type(uint256).max;
         uint256 nonce = nft.nonces(tokenId);
 
@@ -132,7 +132,7 @@ contract ERC4494Test is ERC4494Bed {
         bytes32 permit = nft.PERMIT_TYPEHASH();
         bytes32 domain = nft.DOMAIN_SEPARATOR();
         address spender = alice;
-        uint256 tokenId = 0;
+        uint256 tokenId = 721;
         uint256 deadline = type(uint256).max;
         uint256 nonce = nft.nonces(tokenId);
 
@@ -156,7 +156,7 @@ contract ERC4494Test is ERC4494Bed {
         bytes32 permit = nft.PERMIT_TYPEHASH();
         bytes32 domain = nft.DOMAIN_SEPARATOR();
         address spender = alice;
-        uint256 tokenId = 0;
+        uint256 tokenId = 721;
         uint256 deadline = type(uint256).max;
         uint256 nonce = nft.nonces(tokenId);
 
@@ -183,7 +183,7 @@ contract ERC4494Test is ERC4494Bed {
         bytes32 permit = nft.PERMIT_TYPEHASH();
         bytes32 domain = nft.DOMAIN_SEPARATOR();
         address spender = alice;
-        uint256 tokenId = 0;
+        uint256 tokenId = 721;
         uint256 deadline = type(uint256).max;
         uint256 nonce = nft.nonces(tokenId);
 
@@ -206,7 +206,7 @@ contract ERC4494Test is ERC4494Bed {
         bytes32 permit = nft.PERMIT_TYPEHASH();
         bytes32 domain = nft.DOMAIN_SEPARATOR();
         address spender = alice;
-        uint256 tokenId = 0;
+        uint256 tokenId = 721;
         uint256 deadline = 1;
         uint256 nonce = nft.nonces(tokenId);
 

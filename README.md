@@ -97,25 +97,45 @@ contract ERC4494Sample is ERC4494, ERC721 {
 
 ## Gas Usage
 ```
-| test/ERC721Mock.sol:ERC721Mock contract         |                 |        |        |        |         |
-|-------------------------------------------------|-----------------|--------|--------|--------|---------|
-| Deployment Cost                                 | Deployment Size |        |        |        |         |
-| 906150                                          | 4554            |        |        |        |         |
-| Function Name                                   | min             | avg    | median | max    | # calls |
-| approve                                         | 4662            | 23329  | 26698  | 28698  | 17      |
-| balanceOf                                       | 567             | 1508   | 567    | 2567   | 51      |
-| getApproved                                     | 363             | 1310   | 363    | 2363   | 19      |
-| isApprovedForAll                                | 761             | 1618   | 761    | 2761   | 14      |
-| mint(address)                                   | 51609           | 68311  | 68709  | 68709  | 43      |
-| mint(address,uint256)                           | 49092           | 106050 | 104946 | 165216 | 4       |
-| ownerOf                                         | 473             | 1273   | 473    | 2473   | 45      |
-| safeMint(address,bytes)                         | 72219           | 72236  | 72226  | 72264  | 3       |
-| safeMint(address,uint256,bytes)                 | 121877          | 121877 | 121877 | 121877 | 1       |
-| safeTransferFrom(address,address,uint256)       | 2683            | 31308  | 35645  | 37552  | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2999            | 31509  | 36006  | 37882  | 18      |
-| setApprovalForAll                               | 24476           | 24476  | 24476  | 24476  | 15      |
-| supportsInterface                               | 244             | 276    | 282    | 295    | 4       |
-| transferFrom                                    | 2633            | 22369  | 33608  | 34292  | 5       |
+| test/ERC721Mock.sol:ERC721Mock contract         |                 |       |        |       |         |
+|-------------------------------------------------|-----------------|-------|--------|-------|---------|
+| Deployment Cost                                 | Deployment Size |       |        |       |         |
+| 783226                                          | 3940            |       |        |       |         |
+| Function Name                                   | min             | avg   | median | max   | # calls |
+| approve                                         | 4662            | 23329 | 26698  | 28698 | 17      |
+| balanceOf                                       | 545             | 1566  | 2545   | 2545  | 47      |
+| getApproved                                     | 363             | 1310  | 363    | 2363  | 19      |
+| isApprovedForAll                                | 717             | 1574  | 717    | 2717  | 14      |
+| mint                                            | 46525           | 46525 | 46525  | 46525 | 43      |
+| ownerOf                                         | 473             | 1549  | 2473   | 2473  | 26      |
+| safeMint                                        | 50070           | 50087 | 50077  | 50115 | 3       |
+| safeTransferFrom(address,address,uint256)       | 2683            | 31308 | 35645  | 37552 | 14      |
+| safeTransferFrom(address,address,uint256,bytes) | 2955            | 31469 | 35962  | 37844 | 18      |
+| setApprovalForAll                               | 24432           | 24432 | 24432  | 24432 | 15      |
+| supportsInterface                               | 244             | 276   | 282    | 295   | 4       |
+| transferFrom                                    | 2633            | 22369 | 33608  | 34292 | 5       |
+```
+
+```
+| test/ERC721EnumerableMock.sol:ERC721EnumerableMock contract |                 |        |        |        |         |
+|-------------------------------------------------------------|-----------------|--------|--------|--------|---------|
+| Deployment Cost                                             | Deployment Size |        |        |        |         |
+| 967816                                                      | 4862            |        |        |        |         |
+| Function Name                                               | min             | avg    | median | max    | # calls |
+| approve                                                     | 4662            | 23329  | 26698  | 28698  | 17      |
+| balanceOf                                                   | 633             | 1574   | 633    | 2633   | 51      |
+| getApproved                                                 | 363             | 1310   | 363    | 2363   | 19      |
+| isApprovedForAll                                            | 827             | 1684   | 827    | 2827   | 14      |
+| mint(address)                                               | 51675           | 68377  | 68775  | 68775  | 43      |
+| mint(address,uint256)                                       | 49136           | 106094 | 104990 | 165260 | 4       |
+| ownerOf                                                     | 539             | 1339   | 539    | 2539   | 45      |
+| safeMint(address,bytes)                                     | 72285           | 72302  | 72292  | 72330  | 3       |
+| safeMint(address,uint256,bytes)                             | 121943          | 121943 | 121943 | 121943 | 1       |
+| safeTransferFrom(address,address,uint256)                   | 2727            | 31350  | 35689  | 37596  | 14      |
+| safeTransferFrom(address,address,uint256,bytes)             | 3065            | 31571  | 36072  | 37948  | 18      |
+| setApprovalForAll                                           | 24542           | 24542  | 24542  | 24542  | 15      |
+| supportsInterface                                           | 244             | 276    | 282    | 295    | 4       |
+| transferFrom                                                | 2655            | 22390  | 33625  | 34314  | 5       |
 ```
 
 ```
