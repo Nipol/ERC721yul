@@ -7,6 +7,19 @@ import "./Constants.sol";
 
 contract ERC721Helper {
     /**
+     * @notice  현재 발행되어 있는 토큰 수량을 반환합니다.
+     * @dev     다음에 민팅될 토큰 번호로 사용할 수 있습니다.
+     * @return  현재 발행된 토큰 수량
+     */
+    function _totalSupply() internal view returns (uint256) {
+        assembly {
+            mstore(0x0, sload(Slot_TokenIndex))
+            return(0x0, 0x20)
+        }
+
+    }
+
+    /**
      * @notice  토큰 아이디가 가지고 있는 Approve된 주소를 반환합니다.
      * @return  approved 주소
      */

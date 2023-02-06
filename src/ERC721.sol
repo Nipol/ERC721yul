@@ -190,10 +190,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             mstore(0xc0, from)
             mstore(0xe0, caller())
             mstore(0x100, Slot_OperatorApprovals)
-            mstore(0xc0, sload(keccak256(0xc0, 0x60)))
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
-            if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
+            if iszero(or(or(eq(caller(), from), sload(keccak256(0xc0, 0x60))), eq(caller(), mload(0x80)))) {
                 mstore(0x0, Error_NotOperaterable_Signature)
                 revert(0x1c, 0x4)
             }
@@ -269,10 +268,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             mstore(0xc0, from)
             mstore(0xe0, caller())
             mstore(0x100, Slot_OperatorApprovals)
-            mstore(0xc0, sload(keccak256(0xc0, 0x60)))
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
-            if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
+            if iszero(or(or(eq(caller(), from), sload(keccak256(0xc0, 0x60))), eq(caller(), mload(0x80)))) {
                 mstore(0x0, Error_NotOperaterable_Signature)
                 revert(0x1c, 0x4)
             }
@@ -350,10 +348,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             mstore(0xc0, from)
             mstore(0xe0, caller())
             mstore(0x100, Slot_OperatorApprovals)
-            mstore(0xc0, sload(keccak256(0xc0, 0x60)))
 
             // 해당 함수의 호출자가, 토큰의 주인이거나 Operator이거나 Approved 된 이용자인지 확인
-            if iszero(or(or(eq(caller(), from), mload(0xc0)), eq(caller(), mload(0x80)))) {
+            if iszero(or(or(eq(caller(), from), sload(keccak256(0xc0, 0x60))), eq(caller(), mload(0x80)))) {
                 mstore(0x0, Error_NotOperaterable_Signature)
                 revert(0x1c, 0x4)
             }

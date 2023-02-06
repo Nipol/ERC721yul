@@ -100,7 +100,7 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | test/ERC721Mock.sol:ERC721Mock contract         |                 |        |        |        |         |
 |-------------------------------------------------|-----------------|--------|--------|--------|---------|
 | Deployment Cost                                 | Deployment Size |        |        |        |         |
-| 908350                                          | 4565            |        |        |        |         |
+| 906150                                          | 4554            |        |        |        |         |
 | Function Name                                   | min             | avg    | median | max    | # calls |
 | approve                                         | 4662            | 23329  | 26698  | 28698  | 17      |
 | balanceOf                                       | 567             | 1508   | 567    | 2567   | 51      |
@@ -111,18 +111,18 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | ownerOf                                         | 473             | 1273   | 473    | 2473   | 45      |
 | safeMint(address,bytes)                         | 72219           | 72236  | 72226  | 72264  | 3       |
 | safeMint(address,uint256,bytes)                 | 121877          | 121877 | 121877 | 121877 | 1       |
-| safeTransferFrom(address,address,uint256)       | 2683            | 31319  | 35657  | 37564  | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2999            | 31520  | 36018  | 37894  | 18      |
+| safeTransferFrom(address,address,uint256)       | 2683            | 31308  | 35645  | 37552  | 14      |
+| safeTransferFrom(address,address,uint256,bytes) | 2999            | 31509  | 36006  | 37882  | 18      |
 | setApprovalForAll                               | 24476           | 24476  | 24476  | 24476  | 15      |
 | supportsInterface                               | 244             | 276    | 282    | 295    | 4       |
-| transferFrom                                    | 2633            | 22371  | 33610  | 34295  | 5       |
+| transferFrom                                    | 2633            | 22369  | 33608  | 34292  | 5       |
 ```
 
 ```
 | test/ERC4494Mock.sol:ERC4494Mock contract |                 |       |        |       |         |
 |-------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                           | Deployment Size |       |        |       |         |
-| 1101014                                   | 5752            |       |        |       |         |
+| 1098814                                   | 5741            |       |        |       |         |
 | Function Name                             | min             | avg   | median | max   | # calls |
 | DOMAIN_SEPARATOR                          | 310             | 310   | 310    | 310   | 7       |
 | PERMIT_TYPEHASH                           | 288             | 288   | 288    | 288   | 7       |
@@ -132,5 +132,5 @@ contract ERC4494Sample is ERC4494, ERC721 {
 | nonces                                    | 407             | 1962  | 2407   | 2407  | 9       |
 | ownerOf                                   | 561             | 561   | 561    | 561   | 1       |
 | permit                                    | 752             | 10643 | 4445   | 31402 | 7       |
-| safeTransferFrom                          | 28413           | 28413 | 28413  | 28413 | 1       |
+| safeTransferFrom                          | 28404           | 28404 | 28404  | 28404 | 1       |
 ```
