@@ -276,7 +276,7 @@ contract ERC721Minted is ERC721Bed {
         assertEq(erc721.ownerOf(722), alice);
     }
 
-    function testSafeTransferFromWithData() public {
+    function testSafeTransferFromWithDataToEOA() public {
         vm.prank(alice);
         vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(alice, bob, 721);

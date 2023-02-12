@@ -250,7 +250,7 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | test/ERC721Mock.sol:ERC721Mock contract         |                 |       |        |        |         |
 |-------------------------------------------------|-----------------|-------|--------|--------|---------|
 | Deployment Cost                                 | Deployment Size |       |        |        |         |
-| 699542                                          | 3522            |       |        |        |         |
+| 828272                                          | 4165            |       |        |        |         |
 | Function Name                                   | min             | avg   | median | max    | # calls |
 | approve                                         | 4662            | 23329 | 26698  | 28698  | 17      |
 | balanceOf                                       | 545             | 1433  | 545    | 2545   | 54      |
@@ -259,19 +259,19 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | mint                                            | 539             | 45644 | 46625  | 46625  | 47      |
 | ownerOf                                         | 473             | 1321  | 473    | 2473   | 33      |
 | safeMint(address,uint256)                       | 49573           | 74400 | 74400  | 99227  | 2       |
-| safeMint(address,uint256,bytes)                 | 829             | 68924 | 50727  | 141803 | 6       |
-| safeTransferFrom(address,address,uint256)       | 2701            | 46994 | 37478  | 106687 | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2949            | 75595 | 38401  | 193799 | 18      |
+| safeMint(address,uint256,bytes)                 | 829             | 68919 | 50721  | 141797 | 6       |
+| safeTransferFrom(address,address,uint256)       | 2683            | 46025 | 35645  | 106390 | 14      |
+| safeTransferFrom(address,address,uint256,bytes) | 2977            | 74593 | 35995  | 193221 | 18      |
 | setApprovalForAll                               | 24454           | 24454 | 24454  | 24454  | 14      |
 | supportsInterface                               | 244             | 276   | 282    | 295    | 4       |
-| transferFrom                                    | 2645            | 22383 | 33622  | 34310  | 5       |
+| transferFrom                                    | 2633            | 22369 | 33608  | 34292  | 5       |
 ```
 
 ```
 | test/ERC721EnumerableMock.sol:ERC721EnumerableMock contract |                 |        |        |        |         |
 |-------------------------------------------------------------|-----------------|--------|--------|--------|---------|
 | Deployment Cost                                             | Deployment Size |        |        |        |         |
-| 857498                                                      | 4311            |        |        |        |         |
+| 949396                                                      | 4770            |        |        |        |         |
 | Function Name                                               | min             | avg    | median | max    | # calls |
 | approve                                                     | 4662            | 23329  | 26698  | 28698  | 17      |
 | balanceOf                                                   | 633             | 1574   | 633    | 2633   | 51      |
@@ -282,18 +282,18 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | ownerOf                                                     | 539             | 1339   | 539    | 2539   | 45      |
 | safeMint(address,bytes)                                     | 52905           | 69312  | 52968  | 102063 | 3       |
 | safeMint(address,uint256,bytes)                             | 174059          | 174059 | 174059 | 174059 | 1       |
-| safeTransferFrom(address,address,uint256)                   | 2745            | 42772  | 37522  | 86831  | 14      |
-| safeTransferFrom(address,address,uint256,bytes)             | 3037            | 75211  | 38489  | 173987 | 18      |
+| safeTransferFrom(address,address,uint256)                   | 2727            | 41803  | 35689  | 86534  | 14      |
+| safeTransferFrom(address,address,uint256,bytes)             | 3065            | 70509  | 36083  | 173409 | 18      |
 | setApprovalForAll                                           | 24542           | 24542  | 24542  | 24542  | 15      |
 | supportsInterface                                           | 264             | 315    | 328    | 341    | 4       |
-| transferFrom                                                | 2667            | 22405  | 33640  | 34332  | 5       |
+| transferFrom                                                | 2655            | 22390  | 33625  | 34314  | 5       |
 ```
 
 ```
 | test/ERC4494Mock.sol:ERC4494Mock contract |                 |       |        |       |         |
 |-------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                           | Deployment Size |       |        |       |         |
-| 864569                                    | 4571            |       |        |       |         |
+| 985694                                    | 5176            |       |        |       |         |
 | Function Name                             | min             | avg   | median | max   | # calls |
 | DOMAIN_SEPARATOR                          | 310             | 310   | 310    | 310   | 7       |
 | PERMIT_TYPEHASH                           | 288             | 288   | 288    | 288   | 7       |
@@ -303,5 +303,5 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | nonces                                    | 407             | 1962  | 2407   | 2407  | 9       |
 | ownerOf                                   | 561             | 561   | 561    | 561   | 1       |
 | permit                                    | 730             | 10621 | 4423   | 31380 | 7       |
-| safeTransferFrom                          | 28595           | 28595 | 28595  | 28595 | 1       |
+| safeTransferFrom                          | 28368           | 28368 | 28368  | 28368 | 1       |
 ```
