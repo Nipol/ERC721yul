@@ -37,18 +37,17 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
         bytes32 domain_deparator = DOMAIN_SEPARATOR;
 
         assembly {
-            // 서명 길이 체크
+            // Check, length of Signature
             if iszero(eq(signature.length, 0x41)) {
                 mstore(0x0, Error_InvalidSignature_Signature)
                 revert(0x1c, 0x4)
             }
 
-            // deadline check
+            // Check, Signature deadline
             if or(eq(timestamp(), deadline), gt(timestamp(), deadline)) {
                 mstore(0x0, Error_TimeOut_Signature)
                 revert(0x1c, 0x4)
             }
-            let memPtr := mload(0x40)
 
             mstore(Permit_ptr, Slot_TokenInfo)
             mstore(Permit_tokenId_ptr, tokenId)
@@ -81,6 +80,7 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
                 revert(0x1c, 0x4)
             }
 
+            // ecrecover
             pop(staticcall(gas(), 0x01, Permit_ptr, 0x80, Permit_ptr, 0x20))
 
             // 실제 소유자와 주소가 다른 경우, 반환 주소가 없거나 0x0인 경우.
@@ -113,9 +113,6 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
                 spender,
                 tokenId
             )
-
-            // restore
-            mstore(mload(Permit_ptr), memPtr)
         }
     }
 
