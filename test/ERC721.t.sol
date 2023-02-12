@@ -9,7 +9,16 @@ import "../src/IERC721TokenReceiver.sol";
 import "./Multicall3.sol";
 
 contract Receiver is IERC721TokenReceiver {
-    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+    address public operator;
+    address public from;
+    uint256 public tid;
+    bytes public data;
+
+    function onERC721Received(address op, address fr, uint256 id, bytes calldata da) public returns (bytes4) {
+        operator = op;
+        from = fr;
+        tid = id;
+        data = da;
         return IERC721TokenReceiver.onERC721Received.selector;
     }
 }
@@ -64,10 +73,95 @@ contract ERC721Deployed is ERC721Bed {
         super.setUp();
     }
 
-    function testSafeMintToReceiverContract() public {
+    function testMintToEOA() public {
+        vm.expectEmit(true, true, true, true, address(erc721));
+        emit Transfer(address(0), alice, 721);
+        erc721.mint(alice, 721);
+
+        assertEq(erc721.balanceOf(alice), 1);
+        assertEq(erc721.ownerOf(721), alice);
+    }
+
+    function testSafeMintToEOA() public {
+        vm.expectEmit(true, true, true, true, address(erc721));
+        emit Transfer(address(0), alice, 721);
+        erc721.safeMint(alice, 721);
+
+        assertEq(erc721.balanceOf(alice), 1);
+        assertEq(erc721.ownerOf(721), alice);
+    }
+
+    function testSafeMintWithDataToEOA() public {
+        vm.expectEmit(true, true, true, true, address(erc721));
+        emit Transfer(address(0), alice, 721);
+        erc721.safeMint(alice, 721, "deadbeef");
+
+        assertEq(erc721.balanceOf(alice), 1);
+        assertEq(erc721.ownerOf(721), alice);
+    }
+
+    function testSafeMintToERC721Receiver() public {
+        vm.expectEmit(true, true, true, true, address(erc721));
+        emit Transfer(address(0), receiver, 721);
+        erc721.safeMint(receiver, 721);
+
+        assertEq(erc721.balanceOf(receiver), 1);
+        assertEq(erc721.ownerOf(721), receiver);
+
+        assertEq(Receiver(receiver).operator(), address(this));
+        assertEq(Receiver(receiver).from(), address(0));
+        assertEq(Receiver(receiver).tid(), 721);
+        assertEq(Receiver(receiver).data(), "");
+    }
+
+    function testMintToERC721Receiver() public {
+        vm.expectEmit(true, true, true, true, address(erc721));
+        emit Transfer(address(0), receiver, 721);
+        erc721.mint(receiver, 721);
+
+        assertEq(erc721.balanceOf(receiver), 1);
+        assertEq(erc721.ownerOf(721), receiver);
+    }
+
+    function testSafeMintWithDataToERC721Receiver() public {
         vm.expectEmit(true, true, true, true, address(erc721));
         emit Transfer(address(0), receiver, 721);
         erc721.safeMint(receiver, 721, "deadbeef");
+
+        assertEq(erc721.balanceOf(receiver), 1);
+        assertEq(erc721.ownerOf(721), receiver);
+
+        assertEq(Receiver(receiver).operator(), address(this));
+        assertEq(Receiver(receiver).from(), address(0));
+        assertEq(Receiver(receiver).tid(), 721);
+        assertEq(Receiver(receiver).data(), "deadbeef");
+    }
+
+    function testMintToEOAOnExistedToken() public {
+        vm.expectEmit(true, true, true, true, address(erc721));
+        emit Transfer(address(0), alice, 721);
+        erc721.mint(alice, 721);
+
+        vm.expectRevert(bytes4(keccak256("ERC721_ExistedToken()")));
+        erc721.mint(bob, 721);
+
+        assertEq(erc721.balanceOf(alice), 1);
+        assertEq(erc721.ownerOf(721), alice);
+    }
+
+    function testSafeMintToERC721ReceiverOnExisted(bytes calldata cd) public {
+        vm.expectEmit(true, true, true, true, address(erc721));
+        emit Transfer(address(0), receiver, 721);
+        erc721.safeMint(receiver, 721, cd);
+
+        assertEq(Receiver(receiver).operator(), address(this));
+        assertEq(Receiver(receiver).from(), address(0));
+        assertEq(Receiver(receiver).tid(), 721);
+        assertEq(Receiver(receiver).data(), cd);
+
+        vm.expectRevert(bytes4(keccak256("ERC721_ExistedToken()")));
+        erc721.safeMint(bob, 721, cd);
+
         assertEq(erc721.balanceOf(receiver), 1);
         assertEq(erc721.ownerOf(721), receiver);
     }
@@ -86,7 +180,7 @@ contract ERC721Deployed is ERC721Bed {
         assertEq(erc721.ownerOf(721), address(0));
     }
 
-    function testSafeTransferFromWithData() public {
+    function testSafeTransferFromNotExistedTokenWithData() public {
         vm.prank(alice);
         vm.expectRevert(bytes4(keccak256("ERC721_NotOwnedToken()")));
         erc721.safeTransferFrom(alice, bob, 0, abi.encode(0x1234));
@@ -95,7 +189,7 @@ contract ERC721Deployed is ERC721Bed {
         assertEq(erc721.ownerOf(0), address(0));
     }
 
-    function testSafeTransferFrom() public {
+    function testSafeTransferFromNotExistedToken() public {
         vm.prank(alice);
         vm.expectRevert(bytes4(keccak256("ERC721_NotOwnedToken()")));
         erc721.safeTransferFrom(alice, bob, 0);
@@ -104,7 +198,7 @@ contract ERC721Deployed is ERC721Bed {
         assertEq(erc721.ownerOf(0), address(0));
     }
 
-    function testTransferFrom() public {
+    function testTransferFromNotExistedToken() public {
         vm.prank(alice);
         vm.expectRevert(bytes4(keccak256("ERC721_NotOwnedToken()")));
         erc721.transferFrom(alice, bob, 0);
@@ -113,7 +207,7 @@ contract ERC721Deployed is ERC721Bed {
         assertEq(erc721.ownerOf(0), address(0));
     }
 
-    function testApprove() public {
+    function testApproveNotExistedToken() public {
         vm.prank(alice);
         vm.expectRevert(bytes4(keccak256("ERC721_NotOwnedToken()")));
         erc721.approve(bob, 0);
@@ -126,13 +220,6 @@ contract ERC721Deployed is ERC721Bed {
         emit ApprovalForAll(alice, bob, true);
         erc721.setApprovalForAll(bob, true);
         assertEq(erc721.isApprovedForAll(alice, bob), true);
-    }
-
-    function testSetApprovalForAllFromContract() public {
-        vm.expectEmit(true, true, true, false, address(erc721));
-        emit ApprovalForAll(address(this), bob, true);
-        erc721.setApprovalForAll(bob, true);
-        assertEq(erc721.isApprovedForAll(address(this), bob), true);
     }
 
     function testGetApproved() public {
@@ -199,7 +286,7 @@ contract ERC721Minted is ERC721Bed {
         assertEq(erc721.ownerOf(721), bob);
     }
 
-    function testSafeTransferFromWithDataNotFromOwner() public {
+    function testSafeTransferFromWithDataByNotFromOwner() public {
         vm.expectRevert(bytes4(keccak256("ERC721_NotOperaterable()")));
         erc721.safeTransferFrom(alice, bob, 721, "");
         assertEq(erc721.balanceOf(alice), 1);
@@ -255,7 +342,7 @@ contract ERC721Minted is ERC721Bed {
         assertEq(erc721.ownerOf(721), bob);
     }
 
-    function testSafeTransferFromNotFromOwner() public {
+    function testSafeTransferFromByNotFromOwner() public {
         vm.expectRevert(bytes4(keccak256("ERC721_NotOperaterable()")));
         erc721.safeTransferFrom(alice, bob, 721);
         assertEq(erc721.balanceOf(alice), 1);

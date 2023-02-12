@@ -32,36 +32,9 @@ abstract contract ERC721Enumerable is IERC721Enumerable, ERC721 {
         }
     }
 
-    /**
-     * @notice  `to`에게 하나의 토큰을 배포합니다.
-     * @dev     스토리지 영역이 초기화되지 않았기 때문에, 초기 가스비용이 많이 소모된다.
-     * @param   to 토큰을 받을 주소
-     */
-    function _mint(address to) internal {
-        assembly {
-            let freeptr := mload(0x40)
-
-            // 소유자 밸런스 증가
-            mstore(0x0, to)
-            mstore(0x20, Slot_OwnerInfo)
-            let PoS := keccak256(0x0, 0x40)
-            sstore(PoS, add(sload(PoS), 0x1))
-
-            // 현재 토큰 카운터를 토큰 아이디로 사용하기 위해 메모리에 저장
-            mstore(0x0, sload(Slot_TokenIndex))
-
-            // 저장된 토큰 카운터에 해당하는 정보 저장.
-            mstore(0x20, mload(0x0))
-            mstore(0x40, Slot_TokenInfo)
-            sstore(keccak256(0x20, 0x40), to)
-            // 토큰 카운터 1증가
-            sstore(Slot_TokenIndex, add(mload(0x0), 0x1))
-
-            log4(0x0, 0x0, Event_Transfer_Signature, 0x0, to, mload(0x0))
-
-            // restore free memory pointer
-            mstore(0x40, freeptr)
-        }
+    function supportsInterface(bytes4 interfaceID) external pure override returns (bool) {
+        return interfaceID == type(IERC721).interfaceId || interfaceID == type(IERC721Enumerable).interfaceId
+            || interfaceID == type(IERC721Metadata).interfaceId || interfaceID == type(IERC165).interfaceId;
     }
 
     /**
@@ -101,108 +74,72 @@ abstract contract ERC721Enumerable is IERC721Enumerable, ERC721 {
     }
 
     /**
-     * @notice  `to`에게 하나의 토큰을 배포합니다.
-     * @dev     해당 함수에서는 마지막 인자로, to 주소로 넘길 데이터를 담아야 합니다.
-     * @param   to 토큰을 받을 주소
-     */
-    function _safemint(address to, bytes calldata) internal {
-        assembly {
-            let freeptr := mload(0x40)
-
-            // 소유자 밸런스 증가
-            mstore(0x0, to)
-            mstore(0x20, Slot_OwnerInfo)
-            let PoS := keccak256(0x0, 0x40)
-            sstore(PoS, add(sload(PoS), 0x1))
-
-            // 현재 토큰 카운터를 토큰 아이디로 사용하기 위해 메모리에 저장
-            mstore(0x0, sload(Slot_TokenIndex))
-
-            // 저장된 토큰 카운터에 해당하는 정보 저장.
-            mstore(0x20, mload(0x0))
-            mstore(0x40, Slot_TokenInfo)
-            sstore(keccak256(0x20, 0x40), to)
-            // 토큰 카운터 1증가
-            sstore(Slot_TokenIndex, add(mload(0x0), 0x1))
-
-            log4(0x0, 0x0, Event_Transfer_Signature, 0x0, to, mload(0x0))
-
-            if gt(extcodesize(to), 0) {
-                mstore(0x40, TokenReceiver_Signature)
-                mstore(0x44, caller())
-                mstore(0x64, 0x0)
-                mstore(0x84, mload(0x0))
-                mstore(0xa4, 0x0000000000000000000000000000000000000000000000000000000000000080)
-                calldatacopy(0xc4, 0x44, sub(calldatasize(), 0x44))
-
-                switch iszero(staticcall(gas(), to, 0x40, add(0x64, sub(calldatasize(), 0x24)), 0x0, 0x20))
-                case true {
-                    // revert case
-                    let returnDataSize := returndatasize()
-                    returndatacopy(0x0, 0x0, returnDataSize)
-                    revert(0x0, returnDataSize)
-                }
-                default {
-                    // interface impl
-                    returndatacopy(0x0, 0x0, 0x4)
-                    if iszero(eq(mload(0x0), TokenReceiver_Signature)) { revert(0x0, 0x0) }
-                }
-            }
-
-            // restore free memory pointer
-            mstore(0x40, freeptr)
-        }
-    }
-
-    /**
      * @notice  `to`에게 `quantity`만큼 토큰을 배포합니다.
      * @dev     해당 함수에서는 마지막 인자로, to 주소로 넘길 데이터를 담아야 합니다.
      * @param   to          토큰을 받을 주소
      */
-    function _safeMint(address to, uint256 quantity, bytes calldata) internal {
+    function _safeMint(address to, uint256 quantity, bytes memory data) internal {
         assembly {
             let freeptr := mload(0x40)
 
             // 0x00 현재 토큰 카운터
-            mstore(0x0, sload(Slot_TokenIndex))
+            mstore(freeptr, sload(Slot_TokenIndex))
             // 0x20 더해진 최대 수량
-            mstore(0x20, add(mload(0x0), quantity))
+            mstore(add(freeptr, 0x20), add(mload(freeptr), quantity))
 
             // 소유자 밸런스 증가
-            mstore(0x40, to)
-            mstore(0x60, Slot_OwnerInfo)
-            let PoS := keccak256(0x40, 0x40)
+            mstore(add(freeptr, 0x40), to)
+            mstore(add(freeptr, 0x60), Slot_OwnerInfo)
+            let PoS := keccak256(add(freeptr, 0x40), 0x40)
             sstore(PoS, add(sload(PoS), quantity))
 
             // to가 contract인가 아닌가
-            mstore(0x40, gt(extcodesize(to), 0))
+            mstore(add(freeptr, 0x40), gt(extcodesize(to), 0))
 
-            for { let tokenId := mload(0x0) } iszero(eq(tokenId, mload(0x20))) { tokenId := add(tokenId, 0x1) } {
+            for { let tokenId := mload(freeptr) } iszero(eq(tokenId, mload(add(freeptr, 0x20)))) {
+                tokenId := add(tokenId, 0x1)
+            } {
                 // 저장된 토큰 카운터에 해당하는 정보 저장.
-                mstore(0x60, tokenId)
-                mstore(0x80, Slot_TokenInfo)
-                sstore(keccak256(0x60, 0x40), to)
+                mstore(add(freeptr, 0x60), tokenId)
+                mstore(add(freeptr, 0x80), Slot_TokenInfo)
+                sstore(keccak256(add(freeptr, 0x60), 0x40), to)
                 log4(0x0, 0x0, Event_Transfer_Signature, 0x0, to, tokenId)
 
-                if mload(0x40) {
-                    mstore(0x60, TokenReceiver_Signature)
-                    mstore(0x64, caller())
-                    mstore(0x84, 0x0)
-                    mstore(0xa4, tokenId)
-                    mstore(0xc4, 0x0000000000000000000000000000000000000000000000000000000000000080)
-                    calldatacopy(0xe4, 0x64, sub(calldatasize(), 0x64))
+                if mload(add(freeptr, 0x40)) {
+                    mstore(add(freeptr, 0x60), TokenReceiver_Signature)
+                    mstore(add(freeptr, 0x64), caller())
+                    mstore(add(freeptr, 0x84), 0x0)
+                    mstore(add(freeptr, 0xa4), tokenId)
+                    mstore(add(freeptr, 0xc4), 0x0000000000000000000000000000000000000000000000000000000000000080)
 
-                    switch iszero(staticcall(gas(), to, 0x60, add(0x84, sub(calldatasize(), 0x64)), 0x0, 0x20))
-                    case true {
+                    if iszero(mload(data)) {
+                        mstore(add(freeptr, 0xe4), 0x0000000000000000000000000000000000000000000000000000000000000000)
+                    }
+
+                    if gt(mload(data), 0) {
+                        mstore(add(freeptr, 0xe4), mload(data))
+                        pop(
+                            staticcall(
+                                gas(),
+                                0x04,
+                                add(data, 0x20),
+                                add(0x20, mload(data)),
+                                add(freeptr, 0x104),
+                                add(0x20, mload(data))
+                            )
+                        )
+                    }
+
+                    if iszero(
+                        and(
+                            or(eq(mload(0x0), TokenReceiver_Signature), iszero(returndatasize())),
+                            call(gas(), to, 0, add(freeptr, 0x60), add(0x84, add(0x20, mload(data))), 0x0, 0x20)
+                        )
+                    ) {
                         // revert case
                         let returnDataSize := returndatasize()
                         returndatacopy(0x0, 0x0, returnDataSize)
                         revert(0x0, returnDataSize)
-                    }
-                    default {
-                        // interface impl
-                        returndatacopy(0x0, 0x0, 0x4)
-                        if iszero(eq(mload(0x0), TokenReceiver_Signature)) { revert(0x0, 0x0) }
                     }
                 }
             }
@@ -213,9 +150,5 @@ abstract contract ERC721Enumerable is IERC721Enumerable, ERC721 {
             // restore free memory pointer
             mstore(0x40, freeptr)
         }
-    }
-
-    function _safemint(address, uint256, bytes calldata) internal pure override {
-        revert();
     }
 }

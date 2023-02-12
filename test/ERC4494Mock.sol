@@ -19,7 +19,8 @@ contract ERC4494Mock is ERC4494, ERC721 {
     }
 
     function safeMint(address to, uint256 id, bytes calldata data) external {
-        _safemint(to, id, data);
+        _mint(to, id);
+        _receivercheck(address(0), to, id, data);
     }
 
     function tokenURI(uint256 tokenId) external pure override returns (string memory) {

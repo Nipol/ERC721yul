@@ -32,6 +32,7 @@ uint256 constant Event_Transfer_Signature = (0xddf252ad1be2c89b69c2b068fc378daa9
 uint256 constant Event_Approval_Signature = (0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925);
 uint256 constant Event_ApprovalForAll_Signature = (0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31);
 
+uint256 constant Error_ExistedToken_Signature = (0xc1f55e86);
 uint256 constant Error_NotOwnedToken_Signature = (0x97058588);
 uint256 constant Error_NotOperaterable_Signature = (0xce6494fa);
 

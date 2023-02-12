@@ -11,7 +11,7 @@ contract ERC721EnumerableMock is ERC721Enumerable {
     string public constant baseURI = "ipfs://";
 
     function mint(address to) external {
-        _mint(to);
+        _mint(to, 1);
     }
 
     function mint(address to, uint256 quantity) external {
@@ -19,7 +19,7 @@ contract ERC721EnumerableMock is ERC721Enumerable {
     }
 
     function safeMint(address to, bytes calldata data) external {
-        _safemint(to, data);
+        _safeMint(to, 1, data);
     }
 
     function safeMint(address to, uint256 quantity, bytes calldata data) external {

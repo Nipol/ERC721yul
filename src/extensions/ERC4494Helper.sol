@@ -7,9 +7,9 @@ import "ERC721/Constants.sol";
 
 contract ERC4494Helper {
     /**
-     * @notice  NFT의 nonce를 반환하는 함수, permit를 구성할 때 사용
-     * @param   tokenId nonce를 조회하고자 하는 NFT 아이디
-     * @return  nonce uint256으로 반환
+     * @notice  Function that returns the nonce held by the token, used when configuring permit
+     * @param   tokenId The NFT unique value for which you want to look up the nonce
+     * @return  nonce Return as uint256
      */
     function _nonces(uint256 tokenId) internal view returns (uint256) {
         assembly {

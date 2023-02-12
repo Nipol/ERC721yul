@@ -7,8 +7,8 @@ import "./Constants.sol";
 
 contract ERC721Helper {
     /**
-     * @notice  토큰 아이디가 가지고 있는 Approve된 주소를 반환합니다.
-     * @return  approved 주소
+     * @notice  Returns the approved address that the token id has
+     * @return  approved Address
      */
     function _getApproved(uint256 tokenId) internal view returns (address) {
         assembly {
@@ -20,10 +20,10 @@ contract ERC721Helper {
     }
 
     /**
-     * @notice  토큰 소유자가 특정 오퍼레이터에게 토큰의 사용 권한을 이양했는지 확인합니다.
-     * @param   owner       토큰 소유자
-     * @param   operator    토큰 사용 대행자
-     * @return  허용 여부
+     * @notice  Verify that the token owner has transferred the token's usage rights to a specific operator.
+     * @param   owner       Token owner
+     * @param   operator    Token operator address
+     * @return  Allowed or not
      */
     function _isApprovedForAll(address owner, address operator) internal view returns (bool) {
         assembly {
@@ -36,8 +36,8 @@ contract ERC721Helper {
     }
 
     /**
-     * @notice  토큰의 소유자 주소를 반환하며, 소유자가 없는경우 zero address를 반환합니다.
-     * @return  소유자 주소
+     * @notice  Returns the address of the owner of the token, or zero address if there is no owner.
+     * @return  Token owner
      */
     function _ownerOf(uint256 tokenId) internal view returns (address) {
         assembly {
@@ -49,9 +49,9 @@ contract ERC721Helper {
     }
 
     /**
-     * @notice  소유자의 주소를 입력받아, 해당 소유자가 가지고 있는 토큰의 수량을 반환한다.
-     * @param   owner   토큰 소유자
-     * @return  소유하고 있는 수량
+     * @notice  Takes an owner's address and returns the number of tokens that owner has.
+     * @param   owner   Token owner
+     * @return  Quantity owned
      */
     function _balanceOf(address owner) external view returns (uint256) {
         assembly {

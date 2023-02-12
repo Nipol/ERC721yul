@@ -7,14 +7,25 @@ import "./Constants.sol";
 
 contract ERC721EnumerableHelper {
     /**
-     * @notice  현재 발행되어 있는 토큰 수량을 반환합니다.
-     * @dev     다음에 민팅될 토큰 번호로 사용할 수 있습니다.
-     * @return  현재 발행된 토큰 수량
+     * @notice  Returns the total number of tokens currently issued.
+     * @dev     This can be used to determine the next token number to be minted.
+     * @return  Total number of tokens issued
      */
     function _totalSupply() internal view returns (uint256) {
         assembly {
             mstore(0x0, sload(Slot_TokenIndex))
             return(0x0, 0x20)
+        }
+    }
+
+    /**
+     * @notice  Sets the starting position when tokens are issued sequentially.
+     * @dev     If you set that value to 100, the ID of the token will start at 100.
+     * @param   initIndex   Unique ID of the token to use as a starting point
+     */
+    function _initialIndex(uint256 initIndex) internal {
+        assembly {
+            sstore(Slot_TokenIndex, initIndex)
         }
     }
 }

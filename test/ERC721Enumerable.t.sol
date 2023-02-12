@@ -9,7 +9,16 @@ import "../src/IERC721TokenReceiver.sol";
 import "./Multicall3.sol";
 
 contract Receiver is IERC721TokenReceiver {
-    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+    address public operator;
+    address public from;
+    uint256 public tid;
+    bytes public data;
+
+    function onERC721Received(address op, address fr, uint256 id, bytes calldata da) external returns (bytes4) {
+        operator = op;
+        from = fr;
+        tid = id;
+        data = da;
         return IERC721TokenReceiver.onERC721Received.selector;
     }
 }
@@ -71,6 +80,11 @@ contract ERC721EnumerableDeployed is ERC721EnumerableBed {
         assertEq(erc721e.balanceOf(receiver), 1);
         assertEq(erc721e.ownerOf(0), receiver);
         assertEq(erc721e.ownerOf(1), address(0));
+
+        assertEq(Receiver(receiver).operator(), address(this));
+        assertEq(Receiver(receiver).from(), address(0));
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), "deadbeef");
     }
 
     function testSafeMintToWrongReceiverContract() public {
@@ -100,6 +114,11 @@ contract ERC721EnumerableDeployed is ERC721EnumerableBed {
         assertEq(erc721e.ownerOf(1), receiver);
         assertEq(erc721e.ownerOf(2), receiver);
         assertEq(erc721e.ownerOf(3), address(0));
+
+        assertEq(Receiver(receiver).operator(), address(this));
+        assertEq(Receiver(receiver).from(), address(0));
+        assertEq(Receiver(receiver).tid(), 2);
+        assertEq(Receiver(receiver).data(), "deadbeef");
     }
 
     function testBulkMintWith3Times() public {
@@ -261,6 +280,11 @@ contract ERC721EnumerableMinted is ERC721EnumerableBed {
         assertEq(erc721e.balanceOf(alice), 0);
         assertEq(erc721e.balanceOf(receiver), 1);
         assertEq(erc721e.ownerOf(0), receiver);
+
+        assertEq(Receiver(receiver).operator(), alice);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), cd);
     }
 
     function testSafeTransferFromWithDataToReceiverContract() public {
@@ -271,6 +295,11 @@ contract ERC721EnumerableMinted is ERC721EnumerableBed {
         assertEq(erc721e.balanceOf(alice), 0);
         assertEq(erc721e.balanceOf(receiver), 1);
         assertEq(erc721e.ownerOf(0), receiver);
+
+        assertEq(Receiver(receiver).operator(), alice);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), abi.encode("hello world"));
     }
 
     function testSafeTransferFromWithDataToWrongReceiverContract() public {
@@ -317,6 +346,11 @@ contract ERC721EnumerableMinted is ERC721EnumerableBed {
         assertEq(erc721e.balanceOf(alice), 0);
         assertEq(erc721e.balanceOf(receiver), 1);
         assertEq(erc721e.ownerOf(0), receiver);
+
+        assertEq(Receiver(receiver).operator(), alice);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), "");
     }
 
     function testSafeTransferFromToWrongReceiverContract() public {
@@ -400,6 +434,11 @@ contract ERC721EnumerableApprover is ERC721EnumerableBed {
         assertEq(erc721e.balanceOf(receiver), 1);
         assertEq(erc721e.ownerOf(0), receiver);
         assertEq(erc721e.getApproved(0), address(0));
+
+        assertEq(Receiver(receiver).operator(), charlie);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), cd);
     }
 
     function testSafeTransferFromWithDataToReceiverContract() public {
@@ -408,6 +447,11 @@ contract ERC721EnumerableApprover is ERC721EnumerableBed {
         emit Transfer(alice, receiver, 0);
         erc721e.safeTransferFrom(alice, receiver, 0, abi.encode("hello world"));
         assertEq(erc721e.getApproved(0), address(0));
+
+        assertEq(Receiver(receiver).operator(), charlie);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), abi.encode("hello world"));
     }
 
     function testSafeTransferFromWithDataToWrongReceiverContract() public {
@@ -438,6 +482,11 @@ contract ERC721EnumerableApprover is ERC721EnumerableBed {
         emit Transfer(alice, receiver, 0);
         erc721e.safeTransferFrom(alice, receiver, 0);
         assertEq(erc721e.getApproved(0), address(0));
+
+        assertEq(Receiver(receiver).operator(), charlie);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), "");
     }
 
     function testSafeTransferFromToWrongReceiverContract() public {
@@ -503,6 +552,11 @@ contract ERC721Operator is ERC721EnumerableBed {
         assertEq(erc721e.balanceOf(receiver), 1);
         assertEq(erc721e.ownerOf(0), receiver);
         assertEq(erc721e.isApprovedForAll(alice, charlie), true);
+
+        assertEq(Receiver(receiver).operator(), charlie);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), cd);
     }
 
     function testSafeTransferFromWithDataToReceiverContract() public {
@@ -511,6 +565,11 @@ contract ERC721Operator is ERC721EnumerableBed {
         emit Transfer(alice, receiver, 0);
         erc721e.safeTransferFrom(alice, receiver, 0, abi.encode("hello world"));
         assertEq(erc721e.isApprovedForAll(alice, charlie), true);
+
+        assertEq(Receiver(receiver).operator(), charlie);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), abi.encode("hello world"));
     }
 
     function testSafeTransferFromWithDataToWrongReceiverContract() public {
@@ -541,6 +600,11 @@ contract ERC721Operator is ERC721EnumerableBed {
         emit Transfer(alice, receiver, 0);
         erc721e.safeTransferFrom(alice, receiver, 0);
         assertEq(erc721e.isApprovedForAll(alice, charlie), true);
+
+        assertEq(Receiver(receiver).operator(), charlie);
+        assertEq(Receiver(receiver).from(), alice);
+        assertEq(Receiver(receiver).tid(), 0);
+        assertEq(Receiver(receiver).data(), "");
     }
 
     function testSafeTransferFromToWrongReceiverContract() public {
