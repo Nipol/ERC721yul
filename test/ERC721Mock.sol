@@ -16,7 +16,7 @@ contract ERC721Mock is ERC721 {
 
     function safeMint(address to, uint256 id) external {
         _mint(to, id);
-        _receivercheck(address(0), to, id, "");
+        _receivercheck(address(0), to, id);
     }
 
     function safeMint(address to, uint256 id, bytes calldata data) external {

@@ -70,18 +70,30 @@ pragma solidity ^0.8.17;
 import "ERC721/ERC721.sol";
 import "ERC721/ERC721Helper.sol";
 
-contract ERC721Sample is ERC721, ERC721Helper {
-    ...
+contract ERC721Sample is ERC721 {
+    function ... {
+        uint256 balance = ERC721Helper.balanceOf(0x4Fe992E566F8a28248acC4cB401b7FfD7dF959B0);
+    }
 }
 ```
 
 **Interfaces**
 ```solidity
 /**
+ * @notice  Functions for sending tokens that exist internally
+ * @param   from    Address to send tokens to
+ * @param   to      Address to receive the token
+ * @param   tokenId Unique ID of the token to send
+ */
+function transferFrom(address from, address to, uint256 tokenId) internal {
+```
+
+```solidity
+/**
  * @notice  Returns the approved address that the token id has
  * @return  approved Address
  */
-function _getApproved(uint256 tokenId) internal view returns (address);
+function getApproved(uint256 tokenId) internal view returns (address);
 ```
 
 ```solidity
@@ -91,7 +103,7 @@ function _getApproved(uint256 tokenId) internal view returns (address);
  * @param   operator    Token operator address
  * @return  Allowed or not
  */
-function _isApprovedForAll(address owner, address operator) internal view returns (bool);
+function isApprovedForAll(address owner, address operator) internal view returns (bool);
 ```
 
 ```solidity
@@ -99,7 +111,7 @@ function _isApprovedForAll(address owner, address operator) internal view return
  * @notice  Returns the address of the owner of the token, or zero address if there is no owner.
  * @return  Token owner
  */
-function _ownerOf(uint256 tokenId) internal view returns (address);
+function ownerOf(uint256 tokenId) internal view returns (address);
 ```
 
 ```solidity
@@ -108,7 +120,7 @@ function _ownerOf(uint256 tokenId) internal view returns (address);
  * @param   owner   Token owner
  * @return  Quantity owned
  */
-function _balanceOf(address owner) external view returns (uint256);
+function balanceOf(address owner) external view returns (uint256);
 ```
 
 ### Enumerable NFT (ERC721Enumerable)
@@ -155,8 +167,10 @@ pragma solidity ^0.8.17;
 import "ERC721/ERC721Enumerable.sol";
 import "ERC721/ERC721EnumerableHelper.sol";
 
-contract ERC721Sample is ERC721Enumerable, ERC721EnumerableHelper {
-    ...
+contract ERC721Sample is ERC721Enumerable {
+    function ... {
+        uint256 total = ERC721EnumerableHelper.totalSupply();
+    }
 }
 ```
 
@@ -167,7 +181,7 @@ contract ERC721Sample is ERC721Enumerable, ERC721EnumerableHelper {
  * @dev     This can be used to determine the next token number to be minted.
  * @return  Total number of tokens issued
  */
-function _totalSupply() internal view returns (uint256);
+function totalSupply() internal view returns (uint256);
 ```
 
 ```solidity
@@ -176,7 +190,7 @@ function _totalSupply() internal view returns (uint256);
  * @dev     If you set that value to 100, the ID of the token will start at 100.
  * @param   initIndex   Unique ID of the token to use as a starting point
  */
-function _initialIndex(uint256 initIndex) internal;
+function initialIndex(uint256 initIndex) internal;
 ```
 
 ### NFT Permit (ERC4494)
@@ -215,8 +229,11 @@ import "ERC721/ERC721.sol"; // or ERC721Enumerable
 import "ERC721/extensions/ERC4494.sol";
 import "ERC721/extensions/ERC4494Helper.sol";
 
-contract ERC4494Sample is ERC4494, ERC721, ERC4494Helper {
+contract ERC4494Sample is ERC4494, ERC721 {
     ...
+    function ... {
+        uint256 nonce = ERC4494Helper.nonces(11);
+    }
 }
 ```
 
@@ -227,7 +244,7 @@ contract ERC4494Sample is ERC4494, ERC721, ERC4494Helper {
  * @param   tokenId The NFT unique value for which you want to look up the nonce
  * @return  nonce Return as uint256
  */
-function _nonces(uint256 tokenId) internal view returns (uint256);
+function nonces(uint256 tokenId) internal view returns (uint256);
 ```
 
 
@@ -250,7 +267,7 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | test/ERC721Mock.sol:ERC721Mock contract         |                 |       |        |        |         |
 |-------------------------------------------------|-----------------|-------|--------|--------|---------|
 | Deployment Cost                                 | Deployment Size |       |        |        |         |
-| 828272                                          | 4165            |       |        |        |         |
+| 803646                                          | 4042            |       |        |        |         |
 | Function Name                                   | min             | avg   | median | max    | # calls |
 | approve                                         | 4662            | 23329 | 26698  | 28698  | 17      |
 | balanceOf                                       | 545             | 1433  | 545    | 2545   | 54      |
@@ -258,10 +275,10 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | isApprovedForAll                                | 739             | 1662  | 739    | 2739   | 13      |
 | mint                                            | 539             | 45644 | 46625  | 46625  | 47      |
 | ownerOf                                         | 473             | 1321  | 473    | 2473   | 33      |
-| safeMint(address,uint256)                       | 49573           | 74400 | 74400  | 99227  | 2       |
-| safeMint(address,uint256,bytes)                 | 829             | 68919 | 50721  | 141797 | 6       |
+| safeMint(address,uint256)                       | 49422           | 74186 | 74186  | 98951  | 2       |
+| safeMint(address,uint256,bytes)                 | 853             | 75913 | 50208  | 185611 | 6       |
 | safeTransferFrom(address,address,uint256)       | 2683            | 46025 | 35645  | 106390 | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2977            | 74593 | 35995  | 193221 | 18      |
+| safeTransferFrom(address,address,uint256,bytes) | 2977            | 75826 | 35995  | 193221 | 18      |
 | setApprovalForAll                               | 24454           | 24454 | 24454  | 24454  | 14      |
 | supportsInterface                               | 244             | 276   | 282    | 295    | 4       |
 | transferFrom                                    | 2633            | 22369 | 33608  | 34292  | 5       |
@@ -271,7 +288,7 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | test/ERC721EnumerableMock.sol:ERC721EnumerableMock contract |                 |        |        |        |         |
 |-------------------------------------------------------------|-----------------|--------|--------|--------|---------|
 | Deployment Cost                                             | Deployment Size |        |        |        |         |
-| 949396                                                      | 4770            |        |        |        |         |
+| 849491                                                      | 4271            |        |        |        |         |
 | Function Name                                               | min             | avg    | median | max    | # calls |
 | approve                                                     | 4662            | 23329  | 26698  | 28698  | 17      |
 | balanceOf                                                   | 633             | 1574   | 633    | 2633   | 51      |
@@ -282,18 +299,18 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | ownerOf                                                     | 539             | 1339   | 539    | 2539   | 45      |
 | safeMint(address,bytes)                                     | 52905           | 69312  | 52968  | 102063 | 3       |
 | safeMint(address,uint256,bytes)                             | 174059          | 174059 | 174059 | 174059 | 1       |
-| safeTransferFrom(address,address,uint256)                   | 2727            | 41803  | 35689  | 86534  | 14      |
-| safeTransferFrom(address,address,uint256,bytes)             | 3065            | 70509  | 36083  | 173409 | 18      |
+| safeTransferFrom(address,address,uint256)                   | 2745            | 42580  | 37319  | 86543  | 14      |
+| safeTransferFrom(address,address,uint256,bytes)             | 3091            | 72364  | 37988  | 173442 | 18      |
 | setApprovalForAll                                           | 24542           | 24542  | 24542  | 24542  | 15      |
 | supportsInterface                                           | 264             | 315    | 328    | 341    | 4       |
-| transferFrom                                                | 2655            | 22390  | 33625  | 34314  | 5       |
+| transferFrom                                                | 2667            | 22405  | 33640  | 34332  | 5       |
 ```
 
 ```
 | test/ERC4494Mock.sol:ERC4494Mock contract |                 |       |        |       |         |
 |-------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                           | Deployment Size |       |        |       |         |
-| 985694                                    | 5176            |       |        |       |         |
+| 854762                                    | 4522            |       |        |       |         |
 | Function Name                             | min             | avg   | median | max   | # calls |
 | DOMAIN_SEPARATOR                          | 310             | 310   | 310    | 310   | 7       |
 | PERMIT_TYPEHASH                           | 288             | 288   | 288    | 288   | 7       |
@@ -303,5 +320,5 @@ function _nonces(uint256 tokenId) internal view returns (uint256);
 | nonces                                    | 407             | 1962  | 2407   | 2407  | 9       |
 | ownerOf                                   | 561             | 561   | 561    | 561   | 1       |
 | permit                                    | 730             | 10621 | 4423   | 31380 | 7       |
-| safeTransferFrom                          | 28368           | 28368 | 28368  | 28368 | 1       |
+| safeTransferFrom                          | 28388           | 28388 | 28388  | 28388 | 1       |
 ```

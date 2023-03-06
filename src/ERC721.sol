@@ -26,20 +26,20 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      * @param   to      토큰 수신자 주소
      * @param   tokenId 전송할 토큰의 ID
      */
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata data)
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes calldata)
         external
         payable
         virtual
     {
         assembly {
-            // 현재 토큰 소유자 0xa0에 저장
+            // 현재 토큰 소유자 불러서 0x0에 저장
             mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenInfo)
             let tmp_ptr := keccak256(0x80, 0x40)
-            mstore(0x00, sload(tmp_ptr))
+            mstore(0x0, sload(tmp_ptr))
 
             // 저장된 토큰 소유자와 from이 같은지 확인
-            if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
+            if iszero(eq(and(mload(0x0), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
                 mstore(0x0, Error_NotOwnedToken_Signature)
                 revert(0x1c, 0x4)
             }
@@ -78,6 +78,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             tmp_ptr := keccak256(0x80, 0x40)
             sstore(tmp_ptr, add(sload(tmp_ptr), 0x1))
 
+            log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
+
             if gt(extcodesize(to), 0) {
                 mstore(0x40, TokenReceiver_Signature)
                 mstore(0x44, caller())
@@ -97,8 +99,6 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                     revert(0x0, returnDataSize)
                 }
             }
-
-            log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
         }
     }
 
@@ -156,6 +156,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             tmp_ptr := keccak256(0x80, 0x40)
             sstore(tmp_ptr, add(sload(tmp_ptr), 0x1))
 
+            log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
+
             if gt(extcodesize(to), 0) {
                 mstore(0x40, TokenReceiver_Signature)
                 mstore(0x44, caller())
@@ -176,8 +178,6 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                     revert(0x0, returnDataSize)
                 }
             }
-
-            log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
         }
     }
 
@@ -399,39 +399,21 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      * @param   id      토큰의 고유 아이디
      * @param   data    토큰을 받는 대상에게 넘길 데이터
      */
-    function _receivercheck(address from, address to, uint256 id, bytes memory data) internal {
+    function _receivercheck(address from, address to, uint256 id, bytes calldata data) internal {
         assembly {
-            let freeptr := mload(0x40)
-
             if extcodesize(to) {
-                mstore(freeptr, TokenReceiver_Signature)
-                mstore(add(freeptr, 0x04), caller())
-                mstore(add(freeptr, 0x24), from)
-                mstore(add(freeptr, 0x44), id)
-                mstore(add(freeptr, 0x64), 0x0000000000000000000000000000000000000000000000000000000000000080)
-
-                if iszero(mload(data)) {
-                    mstore(add(freeptr, 0x84), 0x0000000000000000000000000000000000000000000000000000000000000000)
-                }
-
-                if gt(mload(data), 0) {
-                    mstore(add(freeptr, 0x84), mload(data))
-                    pop(
-                        staticcall(
-                            gas(),
-                            0x04,
-                            add(data, 0x20),
-                            add(0x20, mload(data)),
-                            add(freeptr, 0xa4),
-                            add(0x20, mload(data))
-                        )
-                    )
-                }
+                mstore(0x40, TokenReceiver_Signature)
+                mstore(0x44, caller())
+                mstore(0x64, from)
+                mstore(0x84, id)
+                mstore(0xa4, 0x0000000000000000000000000000000000000000000000000000000000000080)
+                mstore(0xc4, data.length)
+                calldatacopy(0xe4, data.offset, data.length)
 
                 if iszero(
                     and(
                         or(eq(mload(0x0), TokenReceiver_Signature), iszero(returndatasize())),
-                        call(gas(), to, 0, freeptr, add(0x84, add(0x20, mload(data))), 0x0, 0x20)
+                        call(gas(), to, 0, 0x40, add(0xa4, data.length), 0x0, 0x20)
                     )
                 ) {
                     // revert case
@@ -440,8 +422,37 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
                     revert(0x0, returnDataSize)
                 }
             }
+        }
+    }
 
-            mstore(0x40, freeptr)
+    /**
+     * @notice  `to`가 컨트랙트인 경우`id` 및 `data`를 `IERC721TokenReceiver` 명세에 맞게 호출하여, 올바른 구현체인지 확인합니다.
+     * @param   from    이전 토큰 소유자, mint되는 것이라면 0x0 주소로 설정되어야 합니다.
+     * @param   to      토큰을 받는 대상의 주소
+     * @param   id      토큰의 고유 아이디
+     */
+    function _receivercheck(address from, address to, uint256 id) internal {
+        assembly {
+            if extcodesize(to) {
+                mstore(0x40, TokenReceiver_Signature)
+                mstore(0x44, caller())
+                mstore(0x64, from)
+                mstore(0x84, id)
+                mstore(0xa4, 0x0000000000000000000000000000000000000000000000000000000000000080)
+                mstore(0xc4, 0x0000000000000000000000000000000000000000000000000000000000000000)
+
+                if iszero(
+                    and(
+                        or(eq(mload(0x0), TokenReceiver_Signature), iszero(returndatasize())),
+                        call(gas(), to, 0, 0x40, 0xa4, 0x0, 0x20)
+                    )
+                ) {
+                    // revert case
+                    let returnDataSize := returndatasize()
+                    returndatacopy(0x0, 0x0, returnDataSize)
+                    revert(0x0, returnDataSize)
+                }
+            }
         }
     }
 }
