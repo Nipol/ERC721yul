@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "ERC721/ERC721.sol";
 import "ERC721/extensions/ERC4494.sol";
@@ -14,20 +14,13 @@ contract ERC4494Mock is ERC4494, ERC721 {
 
     constructor() ERC4494(name, version) { }
 
-    function mint(address to) external {
-        _mint(to);
+    function mint(address to, uint256 id) external {
+        _mint(to, id);
     }
 
-    function mint(address to, uint256 quantity) external {
-        _mint(to, quantity);
-    }
-
-    function safeMint(address to, bytes calldata data) external {
-        _safemint(to, data);
-    }
-
-    function safeMint(address to, uint256 quantity, bytes calldata data) external {
-        _safeMint(to, quantity, data);
+    function safeMint(address to, uint256 id, bytes calldata data) external {
+        _mint(to, id);
+        _receivercheck(address(0), to, id, data);
     }
 
     function tokenURI(uint256 tokenId) external pure override returns (string memory) {

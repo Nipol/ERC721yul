@@ -1,5 +1,5 @@
 [profile.default]
-solc = '0.8.17'
+solc = '0.8.18'
 via_ir = true
 src = 'src'
 out = 'out'
@@ -7,7 +7,7 @@ libs = ['lib']
 optimizer = true
 optimizer_runs = 4_294_967_295
 extra_output = ["evm.assembly", "irOptimized", "devdoc"]
-gas_reports = ["ERC721Mock", "ERC4494Mock"]
+gas_reports = ["ERC721Mock", "ERC4494Mock", "ERC721EnumerableMock", "ERC5192Mock"]
 remappings = [
     'forge-std/=lib/forge-std/src/',
     'ERC721/=src/',

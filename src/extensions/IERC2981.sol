@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 interface IERC2981 {
     /// ERC165 bytes to add to interface array - set in parent contract

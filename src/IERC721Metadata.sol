@@ -1,7 +1,7 @@
 /**
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 /* is ERC721 */
 interface IERC721Metadata {
@@ -12,8 +12,8 @@ interface IERC721Metadata {
     function symbol() external view returns (string memory);
 
     /// @notice A distinct Uniform Resource Identifier (URI) for a given asset.
-    /// @dev Throws if `_tokenId` is not a valid NFT. URIs are defined in RFC
+    /// @dev Throws if `tokenId` is not a valid NFT. URIs are defined in RFC
     ///  3986. The URI may point to a JSON file that conforms to the "ERC721
     ///  Metadata JSON Schema".
-    function tokenURI(uint256 _tokenId) external view returns (string memory);
+    function tokenURI(uint256 tokenId) external view returns (string memory);
 }
