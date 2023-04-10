@@ -247,78 +247,66 @@ contract ERC4494Sample is ERC4494, ERC721 {
 function nonces(uint256 tokenId) internal view returns (uint256);
 ```
 
-
-## TODO
-
-- [x] bytes copy from calldata.
-- [x] Diabled parameter, parse from calldata.
-- [x] constants memory space, and reuse.
-- [x] Optimize `onERC721Received` call.
-- [x] remove check zero address.
-- [x] fuzz to calldata.
-- [x] emit Event.
-- [x] Minimize storage key calculate
-- [ ] Minimize name and symbol
-- [ ] only yul
-
-
 ## Gas Usage
 ```
 | test/ERC721Mock.sol:ERC721Mock contract         |                 |       |        |        |         |
 |-------------------------------------------------|-----------------|-------|--------|--------|---------|
 | Deployment Cost                                 | Deployment Size |       |        |        |         |
-| 803646                                          | 4042            |       |        |        |         |
+| 783226                                          | 3940            |       |        |        |         |
 | Function Name                                   | min             | avg   | median | max    | # calls |
-| approve                                         | 4662            | 23329 | 26698  | 28698  | 17      |
-| balanceOf                                       | 545             | 1433  | 545    | 2545   | 54      |
+| approve                                         | 4563            | 23238 | 26608  | 28608  | 17      |
+| balanceOf                                       | 539             | 1427  | 539    | 2539   | 54      |
 | getApproved                                     | 363             | 1310  | 363    | 2363   | 19      |
 | isApprovedForAll                                | 739             | 1662  | 739    | 2739   | 13      |
-| mint                                            | 539             | 45644 | 46625  | 46625  | 47      |
-| ownerOf                                         | 473             | 1321  | 473    | 2473   | 33      |
-| safeMint(address,uint256)                       | 49422           | 74186 | 74186  | 98951  | 2       |
-| safeMint(address,uint256,bytes)                 | 853             | 75913 | 50208  | 185611 | 6       |
-| safeTransferFrom(address,address,uint256)       | 2683            | 46025 | 35645  | 106390 | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2977            | 75826 | 35995  | 193221 | 18      |
+| mint                                            | 471             | 45571 | 46552  | 46552  | 47      |
+| ownerOf                                         | 410             | 1258  | 410    | 2410   | 33      |
+| safeMint(address,uint256)                       | 49349           | 74113 | 74113  | 98878  | 2       |
+| safeMint(address,uint256,bytes)                 | 785             | 72140 | 50135  | 163335 | 6       |
+| safeTransferFrom(address,address,uint256)       | 2596            | 46713 | 37182  | 106317 | 14      |
+| safeTransferFrom(address,address,uint256,bytes) | 2896            | 75111 | 37779  | 193144 | 18      |
 | setApprovalForAll                               | 24454           | 24454 | 24454  | 24454  | 14      |
 | supportsInterface                               | 244             | 276   | 282    | 295    | 4       |
-| transferFrom                                    | 2633            | 22369 | 33608  | 34292  | 5       |
+| transferFrom                                    | 2549            | 22295 | 33545  | 34214  | 5       |
 ```
 
 ```
 | test/ERC721EnumerableMock.sol:ERC721EnumerableMock contract |                 |        |        |        |         |
 |-------------------------------------------------------------|-----------------|--------|--------|--------|---------|
 | Deployment Cost                                             | Deployment Size |        |        |        |         |
-| 849491                                                      | 4271            |        |        |        |         |
+| 926570                                                      | 4656            |        |        |        |         |
 | Function Name                                               | min             | avg    | median | max    | # calls |
-| approve                                                     | 4662            | 23329  | 26698  | 28698  | 17      |
-| balanceOf                                                   | 633             | 1574   | 633    | 2633   | 51      |
+| approve                                                     | 4563            | 23238  | 26608  | 28608  | 17      |
+| balanceOf                                                   | 627             | 1568   | 627    | 2627   | 51      |
 | getApproved                                                 | 363             | 1310   | 363    | 2363   | 19      |
 | isApprovedForAll                                            | 827             | 1684   | 827    | 2827   | 14      |
-| mint(address)                                               | 51855           | 68557  | 68955  | 68955  | 43      |
-| mint(address,uint256)                                       | 49181           | 106139 | 105035 | 165305 | 4       |
-| ownerOf                                                     | 539             | 1339   | 539    | 2539   | 45      |
-| safeMint(address,bytes)                                     | 52905           | 69312  | 52968  | 102063 | 3       |
-| safeMint(address,uint256,bytes)                             | 174059          | 174059 | 174059 | 174059 | 1       |
-| safeTransferFrom(address,address,uint256)                   | 2745            | 42580  | 37319  | 86543  | 14      |
-| safeTransferFrom(address,address,uint256,bytes)             | 3091            | 72364  | 37988  | 173442 | 18      |
+| mint(address)                                               | 51754           | 68456  | 68854  | 68854  | 43      |
+| mint(address,uint256)                                       | 49015           | 105908 | 104836 | 164944 | 4       |
+| ownerOf                                                     | 476             | 1276   | 476    | 2476   | 45      |
+| safeMint(address,bytes)                                     | 52845           | 69250  | 52908  | 101998 | 3       |
+| safeMint(address,uint256,bytes)                             | 173898          | 173898 | 173898 | 173898 | 1       |
+| safeTransferFrom(address,address,uint256)                   | 2640            | 42491  | 37226  | 86461  | 14      |
+| safeTransferFrom(address,address,uint256,bytes)             | 2984            | 69794  | 37867  | 173332 | 18      |
 | setApprovalForAll                                           | 24542           | 24542  | 24542  | 24542  | 15      |
 | supportsInterface                                           | 264             | 315    | 328    | 341    | 4       |
-| transferFrom                                                | 2667            | 22405  | 33640  | 34332  | 5       |
+| transferFrom                                                | 2571            | 22317  | 33563  | 34236  | 5       |
 ```
 
 ```
 | test/ERC4494Mock.sol:ERC4494Mock contract |                 |       |        |       |         |
 |-------------------------------------------|-----------------|-------|--------|-------|---------|
 | Deployment Cost                           | Deployment Size |       |        |       |         |
-| 854762                                    | 4522            |       |        |       |         |
+| 934641                                    | 4921            |       |        |       |         |
 | Function Name                             | min             | avg   | median | max   | # calls |
 | DOMAIN_SEPARATOR                          | 310             | 310   | 310    | 310   | 7       |
 | PERMIT_TYPEHASH                           | 288             | 288   | 288    | 288   | 7       |
-| balanceOf                                 | 633             | 633   | 633    | 633   | 2       |
+| balanceOf                                 | 627             | 627   | 627    | 627   | 2       |
 | getApproved                               | 363             | 363   | 363    | 363   | 2       |
-| mint                                      | 46691           | 46691 | 46691  | 46691 | 7       |
-| nonces                                    | 407             | 1962  | 2407   | 2407  | 9       |
-| ownerOf                                   | 561             | 561   | 561    | 561   | 1       |
-| permit                                    | 730             | 10621 | 4423   | 31380 | 7       |
-| safeTransferFrom                          | 28388           | 28388 | 28388  | 28388 | 1       |
+| mint                                      | 46618           | 46618 | 46618  | 46618 | 7       |
+| nonces                                    | 344             | 1899  | 2344   | 2344  | 9       |
+| ownerOf                                   | 498             | 498   | 498    | 498   | 1       |
+| permit                                    | 730             | 10570 | 4348   | 31314 | 7       |
+| safeTransferFrom                          | 28317           | 28317 | 28317  | 28317 | 1       |
 ```
+
+## Donation
+yoonsung.eth - 0x4Fe992E566F8a28248acC4cB401b7FfD7dF959B0

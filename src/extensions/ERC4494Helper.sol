@@ -13,10 +13,8 @@ library ERC4494Helper {
      */
     function nonces(uint256 tokenId) internal view returns (uint256) {
         assembly {
-            mstore(0x20, Slot_TokenInfo)
-            mstore(0x00, tokenId)
-            mstore(0x00, shr(0xA0, sload(keccak256(0x00, 0x40))))
-            return(0x00, 0x20)
+            mstore(0x0, shr(0xa0, sload(tokenId)))
+            return(0x0, 0x20)
         }
     }
 }

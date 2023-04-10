@@ -25,8 +25,8 @@ abstract contract ERC721Enumerable is IERC721Enumerable, ERC721 {
     function tokenOfOwnerByIndex(address owner, uint256 index) external view returns (uint256) {
         assembly {
             mstore(0x0, owner)
-            mstore(0x20, Slot_OwnerInfo)
-            if gt(index, and(sload(keccak256(0x0, 0x40)), 0xffffffffffffffff)) { revert(0, 0) }
+            mstore8(0x0, Slot_OwnerInfo)
+            if gt(index, and(sload(keccak256(0x0, 0x20)), 0xffffffffffffffff)) { revert(0, 0) }
             mstore(0x0, index)
             return(0x0, 0x20)
         }
@@ -53,15 +53,13 @@ abstract contract ERC721Enumerable is IERC721Enumerable, ERC721 {
 
             // 소유자 밸런스 증가
             mstore(0x40, to)
-            mstore(0x60, Slot_OwnerInfo)
-            let PoS := keccak256(0x40, 0x40)
+            mstore8(0x40, Slot_OwnerInfo)
+            let PoS := keccak256(0x40, 0x20)
             sstore(PoS, add(sload(PoS), quantity))
 
             for { let tokenId := mload(0x0) } iszero(eq(tokenId, mload(0x20))) { tokenId := add(tokenId, 0x01) } {
                 // 저장된 토큰 카운터에 해당하는 정보 저장.
-                mstore(0x40, tokenId)
-                mstore(0x60, Slot_TokenInfo)
-                sstore(keccak256(0x40, 0x40), to)
+                sstore(tokenId, to)
                 log4(0x0, 0x0, Event_Transfer_Signature, 0x0, to, tokenId)
             }
 
@@ -89,8 +87,8 @@ abstract contract ERC721Enumerable is IERC721Enumerable, ERC721 {
 
             // 소유자 밸런스 증가
             mstore(add(freeptr, 0x40), to)
-            mstore(add(freeptr, 0x60), Slot_OwnerInfo)
-            let PoS := keccak256(add(freeptr, 0x40), 0x40)
+            mstore8(add(freeptr, 0x40), Slot_OwnerInfo)
+            let PoS := keccak256(add(freeptr, 0x40), 0x20)
             sstore(PoS, add(sload(PoS), quantity))
 
             // to가 contract인가 아닌가
@@ -100,9 +98,7 @@ abstract contract ERC721Enumerable is IERC721Enumerable, ERC721 {
                 tokenId := add(tokenId, 0x1)
             } {
                 // 저장된 토큰 카운터에 해당하는 정보 저장.
-                mstore(add(freeptr, 0x60), tokenId)
-                mstore(add(freeptr, 0x80), Slot_TokenInfo)
-                sstore(keccak256(add(freeptr, 0x60), 0x40), to)
+                sstore(tokenId, to)
                 log4(0x0, 0x0, Event_Transfer_Signature, 0x0, to, tokenId)
 
                 if mload(add(freeptr, 0x40)) {

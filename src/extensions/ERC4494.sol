@@ -49,12 +49,8 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
                 revert(0x1c, 0x4)
             }
 
-            mstore(Permit_ptr, Slot_TokenInfo)
-            mstore(Permit_tokenId_ptr, tokenId)
-            // 토큰 정보 포지션 키 계산
-            let pos := keccak256(Permit_tokenId_ptr, 0x40)
             // 토큰 정보 필드를 0x0에 저장
-            mstore(Permit_tokenInfo_ptr, sload(pos))
+            mstore(Permit_tokenInfo_ptr, sload(tokenId))
 
             // generate hash
             mstore(Permit_ptr, permit_typehash)
@@ -95,12 +91,13 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
             }
 
             // force approve
+            mstore(Permit_tokenId_ptr, tokenId)
             mstore(Permit_ptr, Slot_TokenAllowance)
             sstore(keccak256(Permit_tokenId_ptr, 0x40), spender)
 
             // nonce 증가
             sstore(
-                pos,
+                tokenId,
                 add(mload(Permit_tokenInfo_ptr), 0x0000000000000000000000010000000000000000000000000000000000000000)
             )
 
@@ -123,10 +120,8 @@ abstract contract ERC4494 is IERC4494, IEIP712 {
      */
     function nonces(uint256 tokenId) external view returns (uint256) {
         assembly {
-            mstore(0x20, Slot_TokenInfo)
-            mstore(0x00, tokenId)
-            mstore(0x00, shr(0xA0, sload(keccak256(0x00, 0x40))))
-            return(0x00, 0x20)
+            mstore(0x0, shr(0xa0, sload(tokenId)))
+            return(0x0, 0x20)
         }
     }
 

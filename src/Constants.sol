@@ -52,21 +52,20 @@ uint256 constant Slot_TokenIndex = (0x5015e739);
 // ┌───────────────────────┬───────────────────────────────────────┐
 // │       Future Use      │              Owner Address            │
 // └───────────────────────┴───────────────────────────────────────┘
-// (uint256(keccak256('ERC721yul.tokenInfo')) - 1)[:4]
-uint256 constant Slot_TokenInfo = (0x5f566c50);
+
 
 //
 // Prototype
 // mapping(uint256 => uint256) private ownerInfo;
 //
 // slot map
-//    3                   2                   1                   0
-//  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-// ┌─────────────────────────────────────────────┬─────────────────┐
-// │       Future Use                            │     balances    │
-// └─────────────────────────────────────────────┴─────────────────┘
-// (uint256(keccak256('ERC721yul.ownerInfo')) - 1)[:4]
-uint256 constant Slot_OwnerInfo = (0xe397be3c);
+//         3                   2                   1                   0
+//   2     1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+// ┌────┬─────────────────────────────────────────────┬─────────────────┐
+// │slot│      Future Use                             │     balances    │
+// └────┴─────────────────────────────────────────────┴─────────────────┘
+// (uint256(keccak256('ERC721yul.ownerInfo')) - 1)[:1]
+uint256 constant Slot_OwnerInfo = (0xe3);
 
 // (uint256(keccak256('ERC721yul.tokenAllowance')) - 1)[:4]
 uint256 constant Slot_TokenAllowance = (0xccea0117);
