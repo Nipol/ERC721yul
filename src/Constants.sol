@@ -4,7 +4,6 @@
 pragma solidity ^0.8.4;
 
 uint256 constant BalanceOf_slot_ptr = 0x00;
-uint256 constant BalanceOf_next_slot_ptr = 0x20;
 uint256 constant BalanceOf_length = 0x20;
 
 uint256 constant Approve_ptr = 0x00;
@@ -39,39 +38,14 @@ uint256 constant Error_NotOperaterable_Signature = (0xce6494fa);
 uint256 constant Error_InvalidSignature_Signature = (0x9c5deda7);
 uint256 constant Error_TimeOut_Signature = (0xf9199e3f);
 
-// (uint256(keccak256('ERC721yul.tokenIndex')) - 1)[:4]
-uint256 constant Slot_TokenIndex = (0x5015e739);
+// (uint256(keccak256('ERC721yul.tokenIndex')) - 1)[:1]
+uint8 constant Slot_TokenIndex = (0x50);
 
-//
-// Prototype
-// mapping(uint256 => uint256) private tokenInfo;
-//
-// slot map
-//   3                   2                   1                   0
-// 2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-// ┌───────────────────────┬───────────────────────────────────────┐
-// │       Future Use      │              Owner Address            │
-// └───────────────────────┴───────────────────────────────────────┘
-// (uint256(keccak256('ERC721yul.tokenInfo')) - 1)[:4]
-uint256 constant Slot_TokenInfo = (0x5f566c50);
+// (uint256(keccak256('ERC721yul.ownerInfo')) - 1)[:1]
+uint8 constant Slot_OwnerInfo = (0xe3);
 
-//
-// Prototype
-// mapping(uint256 => uint256) private ownerInfo;
-//
-// slot map
-//    3                   2                   1                   0
-//  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-// ┌─────────────────────────────────────────────┬─────────────────┐
-// │       Future Use                            │     balances    │
-// └─────────────────────────────────────────────┴─────────────────┘
-// (uint256(keccak256('ERC721yul.ownerInfo')) - 1)[:4]
-uint256 constant Slot_OwnerInfo = (0xe397be3c);
+// (uint256(keccak256('ERC721yul.tokenAllowance')) - 1)[:1]
+uint8 constant Slot_TokenAllowance = (0xcc);
 
-// (uint256(keccak256('ERC721yul.tokenAllowance')) - 1)[:4]
-uint256 constant Slot_TokenAllowance = (0xccea0117);
-
-// Prototype
-// `mapping(address => mapping(address => bool))` to `let slot := abi.encodePacked(slot + address + address)`
-// (uint256(keccak256('ERC721yul.operatorApprovals')) - 1)[:4]
-uint256 constant Slot_OperatorApprovals = (0xff81a518);
+// (uint256(keccak256('ERC721yul.operatorApprovals')) - 1)[:1]
+uint8 constant Slot_OperatorApprovals = (0xff);

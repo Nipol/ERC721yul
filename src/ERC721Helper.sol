@@ -14,11 +14,8 @@ library ERC721Helper {
      */
     function transferFrom(address from, address to, uint256 tokenId) internal {
         assembly {
-            // 현재 토큰 소유자 0xa0에 저장
-            mstore(0x80, tokenId)
-            mstore(0xa0, Slot_TokenInfo)
-            let tmp_ptr := keccak256(0x80, 0x40)
-            mstore(0x00, sload(tmp_ptr))
+            // 현재 토큰 소유자 0x0에 저장
+            mstore(0x0, sload(tokenId))
 
             // 저장된 토큰 소유자와 from이 같은지 확인
             if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
@@ -27,6 +24,7 @@ library ERC721Helper {
             }
 
             // 현재 토큰의 approve된 유저 정보를 0x80에 저장하고 0으로 만든다.
+            mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenAllowance)
             let slot_ptr := keccak256(0x80, 0x40)
             mstore(0x80, sload(slot_ptr))
@@ -45,18 +43,18 @@ library ERC721Helper {
             // approved가 0 이라면 굳이 초기화 하진 않는다.
             if gt(mload(0x80), 0) { sstore(slot_ptr, 0x0) }
 
-            // 토큰ID에 대한 새로운 소유자 정보 업데이트
+            // 토큰ID에 대한 새로운 소유자 정보 업데이트, 토큰 정보 확장필드 보존
             mstore(0x0c, shl(0x60, to))
-            sstore(tmp_ptr, mload(0x00))
+            sstore(tokenId, mload(0x0))
 
             // 토큰 소유자의 밸런스 값을 1 줄인다
             mstore(0x80, from)
-            mstore(0xa0, Slot_OwnerInfo)
-            tmp_ptr := keccak256(0x80, 0x40)
+            mstore8(0x80, Slot_OwnerInfo)
+            let tmp_ptr := keccak256(0x80, 0x20)
             sstore(tmp_ptr, sub(sload(tmp_ptr), 0x1))
 
             // 토큰 수취자의 밸런스 값을 1 증가시킨다
-            mstore(0x80, to)
+            mstore(0x8c, shl(0x60, to))
             tmp_ptr := keccak256(0x80, 0x40)
             sstore(tmp_ptr, add(sload(tmp_ptr), 0x1))
 
@@ -99,10 +97,8 @@ library ERC721Helper {
      */
     function ownerOf(uint256 tokenId) internal view returns (address) {
         assembly {
-            mstore(0x00, tokenId)
-            mstore(0x20, Slot_TokenInfo)
-            mstore(0x00, and(sload(keccak256(0x00, 0x40)), 0xffffffffffffffffffffffffffffffffffffffff))
-            return(0x00, 0x20)
+            mstore(0x0, and(sload(tokenId), 0xffffffffffffffffffffffffffffffffffffffff))
+            return(0x0, 0x20)
         }
     }
 
@@ -114,8 +110,8 @@ library ERC721Helper {
     function balanceOf(address owner) external view returns (uint256) {
         assembly {
             mstore(BalanceOf_slot_ptr, owner)
-            mstore(BalanceOf_next_slot_ptr, Slot_OwnerInfo)
-            mstore(BalanceOf_slot_ptr, and(sload(keccak256(BalanceOf_slot_ptr, 0x40)), 0xffffffffffffffff))
+            mstore8(BalanceOf_slot_ptr, Slot_OwnerInfo)
+            mstore(BalanceOf_slot_ptr, and(sload(keccak256(BalanceOf_slot_ptr, 0x20)), 0xffffffffffffffff))
             return(BalanceOf_slot_ptr, BalanceOf_length)
         }
     }

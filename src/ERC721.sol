@@ -11,7 +11,62 @@ import "./IERC721Metadata.sol";
 /**
  * @title ERC721
  * @author yoonsung.eth
- * @dev 일반적으로 사용하는 방법에 맞춰 최적화한 NFT.
+ * @notice 일반적으로 사용하는 방법에 맞춰 최적화한 NFT.
+ * @dev
+ * \=====================STORAGE LAYOUT=====================\
+ * mapping(uint256 => uint256) private tokenInfo;
+ *    3                   2                   1                   0
+ *  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+ * ┌───────────────────────────────────────────────────────────────┐
+ * │                          Token Id                             │
+ * └───────────────────────────────────────────────────────────────┘
+ *    3                   2                   1                   0
+ *  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+ * ┌───────────────────────┬───────────────────────────────────────┐
+ * │       Future Use      │              Owner Address            │
+ * └───────────────────────┴───────────────────────────────────────┘
+ * 
+ * 
+ * mapping(address => uint256) private ownerInfo;
+ *       3                   2                   1                   0
+ *  2    1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+ * ┌───┬──────────────────────┬───────────────────────────────────────┐
+ * │uid│                      │              Owner Address            │
+ * └───┴──────────────────────┴───────────────────────────────────────┘
+ *    3                   2                   1                   0
+ *  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+ * ┌─────────────────────────────────────────────┬─────────────────┐
+ * │       Future Use                            │     balances    │
+ * └─────────────────────────────────────────────┴─────────────────┘
+ * 
+ * 
+ * mapping(uint256 => uint256) private tokenAllowance;
+ *    3                   2                   1                   0   0
+ *  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0   0
+ * ┌───────────────────────────────────────────────────────────────┐┌───┐
+ * │                          Token Id                             ││uid│
+ * └───────────────────────────────────────────────────────────────┘└───┘
+ *    3                   2                   1                   0
+ *  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+ * ┌───────────────────────┬───────────────────────────────────────┐
+ * │       Future Use      │            Spender Address            │
+ * └───────────────────────┴───────────────────────────────────────┘
+ * 
+ * 
+ * mapping(address => mapping(address => bool)) operatorApprovals
+ *    3                   2                   1                   0   0
+ *  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0   0
+ * ┌───────────────────────┬───────────────────────────────────────┐
+ * │                       │            Owner Address              │
+ * └───────────────────────┴───────────────────────────────────────┘
+ * ┌───────────────────────┬───────────────────────────────────────┐┌───┐
+ * │                       │            Spender Address            ││uid│
+ * └───────────────────────┴───────────────────────────────────────┘└───┘
+ *    3                   2                   1                       0
+ *  2 1 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1     0
+ * ┌──────────────────────────────────────────────────────────────┬─────┐
+ * │       Future Use                                             │aprvd│
+ * └──────────────────────────────────────────────────────────────┴─────┘
  */
 abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
     error ERC721_ExistedToken();
@@ -32,11 +87,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
         virtual
     {
         assembly {
-            // 현재 토큰 소유자 불러서 0x0에 저장
-            mstore(0x80, tokenId)
-            mstore(0xa0, Slot_TokenInfo)
-            let tmp_ptr := keccak256(0x80, 0x40)
-            mstore(0x0, sload(tmp_ptr))
+            // 현재 토큰 소유자와 필드 0x0에 저장
+            mstore(0x0, sload(tokenId))
 
             // 저장된 토큰 소유자와 from이 같은지 확인
             if iszero(eq(and(mload(0x0), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
@@ -45,6 +97,7 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             }
 
             // 현재 토큰의 approve된 유저 정보를 0x80에 저장.
+            mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenAllowance)
             let slot_ptr := keccak256(0x80, 0x40)
             mstore(0x80, sload(slot_ptr))
@@ -63,19 +116,19 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             // approved가 0 이라면 굳이 초기화 하진 않는다.
             if gt(mload(0x80), 0) { sstore(slot_ptr, 0x0) }
 
-            // 토큰ID에 대한 새로운 소유자 정보 업데이트
+            // 토큰ID에 대한 새로운 소유자 정보 업데이트, 토큰 정보 확장필드 보존
             mstore(0x0c, shl(0x60, to))
-            sstore(tmp_ptr, mload(0x00))
+            sstore(tokenId, mload(0x0))
 
             // 토큰 소유자의 밸런스 값을 1 줄인다
             mstore(0x80, from)
-            mstore(0xa0, Slot_OwnerInfo)
-            tmp_ptr := keccak256(0x80, 0x40)
+            mstore8(0x80, Slot_OwnerInfo)
+            let tmp_ptr := keccak256(0x80, 0x20)
             sstore(tmp_ptr, sub(sload(tmp_ptr), 0x1))
 
             // 토큰 수취자의 밸런스 값을 1 증가시킨다
-            mstore(0x80, to)
-            tmp_ptr := keccak256(0x80, 0x40)
+            mstore(0x8c, shl(0x60, to))
+            tmp_ptr := keccak256(0x80, 0x20)
             sstore(tmp_ptr, add(sload(tmp_ptr), 0x1))
 
             log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
@@ -110,11 +163,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function safeTransferFrom(address from, address to, uint256 tokenId) external payable virtual {
         assembly {
-            // 현재 토큰 소유자 0xa0에 저장
-            mstore(0x80, tokenId)
-            mstore(0xa0, Slot_TokenInfo)
-            let tmp_ptr := keccak256(0x80, 0x40)
-            mstore(0x00, sload(tmp_ptr))
+            // 현재 토큰 소유자와 필드 0x0에 저장
+            mstore(0x0, sload(tokenId))
 
             // 저장된 토큰 소유자와 from이 같은지 확인
             if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
@@ -123,6 +173,7 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             }
 
             // 현재 토큰의 approve된 유저 정보를 0x80에 저장하고 0으로 만든다.
+            mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenAllowance)
             let slot_ptr := keccak256(0x80, 0x40)
             mstore(0x80, sload(slot_ptr))
@@ -141,19 +192,19 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             // approved가 0 이라면 굳이 초기화 하진 않는다.
             if gt(mload(0x80), 0) { sstore(slot_ptr, 0x0) }
 
-            // 토큰ID에 대한 새로운 소유자 정보 업데이트
+            // 토큰ID에 대한 새로운 소유자 정보 업데이트, 토큰 정보 확장필드 보존
             mstore(0x0c, shl(0x60, to))
-            sstore(tmp_ptr, mload(0x00))
+            sstore(tokenId, mload(0x0))
 
             // 토큰 소유자의 밸런스 값을 1 줄인다
             mstore(0x80, from)
-            mstore(0xa0, Slot_OwnerInfo)
-            tmp_ptr := keccak256(0x80, 0x40)
+            mstore8(0x80, Slot_OwnerInfo)
+            let tmp_ptr := keccak256(0x80, 0x20)
             sstore(tmp_ptr, sub(sload(tmp_ptr), 0x1))
 
             // 토큰 수취자의 밸런스 값을 1 증가시킨다
-            mstore(0x80, to)
-            tmp_ptr := keccak256(0x80, 0x40)
+            mstore(0x8c, shl(0x60, to))
+            tmp_ptr := keccak256(0x80, 0x20)
             sstore(tmp_ptr, add(sload(tmp_ptr), 0x1))
 
             log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
@@ -189,19 +240,17 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function transferFrom(address from, address to, uint256 tokenId) external payable virtual {
         assembly {
-            // 현재 토큰 소유자 0xa0에 저장
-            mstore(0x80, tokenId)
-            mstore(0xa0, Slot_TokenInfo)
-            let tmp_ptr := keccak256(0x80, 0x40)
-            mstore(0x00, sload(tmp_ptr))
+            // 현재 토큰 소유자와 필드 0x0에 저장
+            mstore(0x0, sload(tokenId))
 
-            // 저장된 토큰 소유자와 from이 같은지 확인
-            if iszero(eq(and(mload(0x00), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
+            // 저장된 소유자 마스킹해서 from이 같은지 확인
+            if iszero(eq(and(mload(0x0), 0xffffffffffffffffffffffffffffffffffffffff), from)) {
                 mstore(0x0, Error_NotOwnedToken_Signature)
                 revert(0x1c, 0x4)
             }
 
             // 현재 토큰의 approve된 유저 정보를 0x80에 저장하고 0으로 만든다.
+            mstore(0x80, tokenId)
             mstore(0xa0, Slot_TokenAllowance)
             let slot_ptr := keccak256(0x80, 0x40)
             mstore(0x80, sload(slot_ptr))
@@ -220,19 +269,19 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
             // approved가 0 이라면 굳이 초기화 하진 않는다.
             if gt(mload(0x80), 0) { sstore(slot_ptr, 0x0) }
 
-            // 토큰ID에 대한 새로운 소유자 정보 업데이트
+            // 토큰ID에 대한 새로운 소유자 정보 업데이트, 토큰 정보 확장필드 보존
             mstore(0x0c, shl(0x60, to))
-            sstore(tmp_ptr, mload(0x00))
+            sstore(tokenId, mload(0x0))
 
             // 토큰 소유자의 밸런스 값을 1 줄인다
             mstore(0x80, from)
-            mstore(0xa0, Slot_OwnerInfo)
-            tmp_ptr := keccak256(0x80, 0x40)
+            mstore8(0x80, Slot_OwnerInfo)
+            let tmp_ptr := keccak256(0x80, 0x20)
             sstore(tmp_ptr, sub(sload(tmp_ptr), 0x1))
 
             // 토큰 수취자의 밸런스 값을 1 증가시킨다
-            mstore(0x80, to)
-            tmp_ptr := keccak256(0x80, 0x40)
+            mstore(0x8c, shl(0x60, to))
+            tmp_ptr := keccak256(0x80, 0x20)
             sstore(tmp_ptr, add(sload(tmp_ptr), 0x1))
 
             log4(0x0, 0x0, Event_Transfer_Signature, from, to, tokenId)
@@ -247,11 +296,9 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
     function approve(address approved, uint256 tokenId) external payable {
         assembly {
             // 현재 토큰 소유자 정보
-            mstore(Approve_ptr, tokenId)
-            mstore(Approve_next_ptr, Slot_TokenInfo)
             mstore(
                 Approve_Operator_owner_ptr,
-                and(sload(keccak256(Approve_ptr, 0x40)), 0xffffffffffffffffffffffffffffffffffffffff)
+                and(sload(tokenId), 0xffffffffffffffffffffffffffffffffffffffff)
             )
 
             // 토큰 소유자가 허용한 오퍼레이터인지 확인
@@ -327,9 +374,7 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      */
     function ownerOf(uint256 tokenId) external view returns (address) {
         assembly {
-            mstore(0x00, tokenId)
-            mstore(0x20, Slot_TokenInfo)
-            mstore(0x00, and(sload(keccak256(0x00, 0x40)), 0xffffffffffffffffffffffffffffffffffffffff))
+            mstore(0x00, and(sload(tokenId), 0xffffffffffffffffffffffffffffffffffffffff))
             return(0x00, 0x20)
         }
     }
@@ -342,8 +387,8 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
     function balanceOf(address owner) external view returns (uint256) {
         assembly {
             mstore(BalanceOf_slot_ptr, owner)
-            mstore(BalanceOf_next_slot_ptr, Slot_OwnerInfo)
-            mstore(BalanceOf_slot_ptr, and(sload(keccak256(BalanceOf_slot_ptr, 0x40)), 0xffffffffffffffff))
+            mstore8(BalanceOf_slot_ptr, Slot_OwnerInfo)
+            mstore(BalanceOf_slot_ptr, and(sload(keccak256(BalanceOf_slot_ptr, 0x20)), 0xffffffffffffffff))
             return(BalanceOf_slot_ptr, BalanceOf_length)
         }
     }
@@ -359,28 +404,24 @@ abstract contract ERC721 is IERC721Metadata, IERC721, IERC165 {
      * @notice  `to`에게 `id` 토큰을 부여합니다.
      * @dev     해당 토큰이 이미 존재하는 경우 revert되어야 합니다.
      * @param   to 토큰을 받을 주소
-     * @param   id 생성될 토큰의 아이디
+     * @param   tokenId 생성될 토큰의 아이디
      */
-    function _mint(address to, uint256 id) internal virtual {
+    function _mint(address to, uint256 tokenId) internal virtual {
         assembly {
             let freeptr := mload(0x40)
 
-            mstore(0x0, id)
-            mstore(0x20, Slot_TokenInfo)
-            let key := keccak256(0x0, 0x40)
-
-            let info := sload(key)
+            let info := sload(tokenId)
 
             if iszero(info) {
                 // 토큰 부여
-                sstore(key, to)
+                sstore(tokenId, to)
                 // 소유자 밸런스 증가
                 mstore(0x0, to)
-                mstore(0x20, Slot_OwnerInfo)
-                let PoS := keccak256(0x0, 0x40)
+                mstore8(0x0, Slot_OwnerInfo)
+                let PoS := keccak256(0x0, 0x20)
                 sstore(PoS, add(sload(PoS), 0x1))
 
-                log4(0x0, 0x0, Event_Transfer_Signature, 0x0, to, id)
+                log4(0x0, 0x0, Event_Transfer_Signature, 0x0, to, tokenId)
             }
 
             if info {
