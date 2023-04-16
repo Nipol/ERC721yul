@@ -261,9 +261,9 @@ function nonces(uint256 tokenId) internal view returns (uint256);
 | mint                                            | 471             | 45571 | 46552  | 46552  | 47      |
 | ownerOf                                         | 410             | 1258  | 410    | 2410   | 33      |
 | safeMint(address,uint256)                       | 49349           | 74113 | 74113  | 98878  | 2       |
-| safeMint(address,uint256,bytes)                 | 785             | 75840 | 50135  | 185538 | 6       |
+| safeMint(address,uint256,bytes)                 | 785             | 68445 | 50135  | 141167 | 6       |
 | safeTransferFrom(address,address,uint256)       | 2596            | 46713 | 37182  | 106317 | 14      |
-| safeTransferFrom(address,address,uint256,bytes) | 2896            | 75111 | 37779  | 193144 | 18      |
+| safeTransferFrom(address,address,uint256,bytes) | 2896            | 78808 | 37779  | 193144 | 18      |
 | setApprovalForAll                               | 24454           | 24454 | 24454  | 24454  | 14      |
 | supportsInterface                               | 244             | 276   | 282    | 295    | 4       |
 | transferFrom                                    | 2549            | 22295 | 33545  | 34214  | 5       |
@@ -285,7 +285,7 @@ function nonces(uint256 tokenId) internal view returns (uint256);
 | safeMint(address,bytes)                                     | 52827           | 69231  | 52890  | 101977 | 3       |
 | safeMint(address,uint256,bytes)                             | 173859          | 173859 | 173859 | 173859 | 1       |
 | safeTransferFrom(address,address,uint256)                   | 2640            | 42491  | 37226  | 86461  | 14      |
-| safeTransferFrom(address,address,uint256,bytes)             | 2984            | 71027  | 37867  | 173332 | 18      |
+| safeTransferFrom(address,address,uint256,bytes)             | 2984            | 68562  | 37867  | 173332 | 18      |
 | setApprovalForAll                                           | 24542           | 24542  | 24542  | 24542  | 15      |
 | supportsInterface                                           | 264             | 315    | 328    | 341    | 4       |
 | transferFrom                                                | 2571            | 22317  | 33563  | 34236  | 5       |
