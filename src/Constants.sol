@@ -4,7 +4,6 @@
 pragma solidity ^0.8.4;
 
 uint256 constant BalanceOf_slot_ptr = 0x00;
-uint256 constant BalanceOf_next_slot_ptr = 0x20;
 uint256 constant BalanceOf_length = 0x20;
 
 uint256 constant Approve_ptr = 0x00;
